@@ -189,6 +189,10 @@
         filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.35));
       }
 
+      .symbol.paw span {
+        filter: invert(1) brightness(2);
+      }
+
       .win .reel {
         border-color: rgba(34, 197, 94, 0.55);
         box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.35), 0 18px 60px rgba(34, 197, 94, 0.12);
@@ -762,16 +766,441 @@
           grid-template-columns: 32px 1fr;
         }
         .achievement-content {
-          padding: 12px 16px;
-          font-size: 16px;
-        }
-        .achievement-icon {
-          font-size: 36px;
-        }
+        padding: 12px 16px;
+        font-size: 16px;
       }
-    </style>
+      .achievement-icon {
+        font-size: 36px;
+      }
+    }
+
+    /* Auth Styles */
+    .auth-container {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+    
+    .app.blurred {
+      filter: blur(8px);
+      pointer-events: none;
+      user-select: none;
+    }
+    
+    .auth-container.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Excavation Minigame Styles */
+    .excavation-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+      aspect-ratio: 1;
+    }
+
+    .excavation-cell {
+      background: var(--panel2);
+      border: 1px solid var(--stroke);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: background 0.2s;
+    }
+
+    .excavation-cell:hover:not(.dug) {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .excavation-cell.dug {
+      background: rgba(0, 0, 0, 0.3);
+      cursor: default;
+    }
+
+    .excavation-cell.dug.found {
+      background: rgba(167, 139, 250, 0.2);
+      border-color: var(--accent);
+    }
+    
+    .excavation-cell.dug.found-full {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: var(--good);
+    }
+
+    .bomb-anim {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      animation: bombDrop 0.5s ease-in forwards;
+    }
+
+    .explosion-anim {
+      position: absolute;
+      inset: -10px;
+      pointer-events: none;
+      z-index: 11;
+      background: radial-gradient(circle, rgba(255,100,0,0.8) 0%, rgba(255,0,0,0) 70%);
+      animation: explosion 0.4s ease-out forwards;
+      border-radius: 50%;
+    }
+
+    @keyframes bombDrop {
+      0% { transform: translateY(-50px) scale(0.5); opacity: 0; }
+      60% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: scale(0); opacity: 0; } 
+    }
+
+    @keyframes explosion {
+      0% { transform: scale(0.5); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+
+    .auth-card {
+      background: linear-gradient(180deg, var(--panel), rgba(255, 255, 255, 0.03));
+      border: 1px solid var(--stroke);
+      border-radius: 24px;
+      padding: 32px;
+      width: min(400px, 100%);
+      box-shadow: 0 20px 80px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .auth-title {
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    
+    .auth-desc {
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+      margin-top: -16px;
+      margin-bottom: 8px;
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .auth-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .auth-label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .auth-input {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--stroke);
+      border-radius: 12px;
+      padding: 12px;
+      color: var(--text);
+      font-size: 16px;
+      outline: none;
+      width: 100%;
+    }
+    
+    .auth-input:focus {
+      border-color: var(--accent);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .password-toggle:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.1);
+    }
+
+    .auth-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s;
+      width: 100%;
+    }
+    
+    .auth-btn:hover {
+      opacity: 0.9;
+    }
+    
+    .auth-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .auth-btn.secondary {
+      background: transparent;
+      border: 1px solid var(--stroke);
+      margin-top: 0;
+    }
+
+    .auth-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+    
+    .auth-link {
+      color: var(--accent2);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    
+    .auth-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Welcome Message Styles */
+    .welcome-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 2500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+    }
+    .welcome-card {
+      background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+      border: 1px solid var(--accent);
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 0 30px rgba(167, 139, 250, 0.3);
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .welcome-btn {
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.1s;
+    }
+    .welcome-btn:active {
+      transform: scale(0.95);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* Demo Email Modal */
+    .demo-email-overlay {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 3000;
+      background: #fff;
+      color: #000;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      max-width: 320px;
+      animation: slideInRight 0.4s ease;
+      font-family: sans-serif;
+      border-left: 4px solid var(--accent);
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .demo-email-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .demo-email-close {
+      cursor: pointer;
+      opacity: 0.5;
+      font-size: 18px;
+    }
+    .demo-email-code {
+      background: #eee;
+      padding: 8px;
+      border-radius: 6px;
+      margin: 8px 0;
+      font-family: monospace;
+      font-size: 18px;
+      text-align: center;
+      letter-spacing: 2px;
+      font-weight: bold;
+    }
+    .demo-email-desc {
+      font-size: 12px;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    .auth-tabs {
+      display: flex;
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 8px;
+    }
+    
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    
+    .auth-tab.active {
+      background: var(--panel2);
+      color: var(--text);
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .auth-msg {
+      font-size: 13px;
+      text-align: center;
+      min-height: 20px;
+    }
+    
+    .auth-msg.error { color: var(--bad); }
+    .auth-msg.success { color: var(--good); }
+
+    .app {
+      transition: filter 0.3s;
+    }
+    
+    .app.blurred {
+      filter: blur(8px);
+      pointer-events: none;
+    }
+  </style>
   </head>
   <body>
+    <div id="authScreen" class="auth-container">
+      <div class="auth-card">
+        <h2 class="auth-title">КотоКазино</h2>
+        <p class="auth-desc">Войдите, чтобы играть</p>
+        
+        <div class="auth-tabs" id="mainTabs">
+          <div class="auth-tab active" onclick="switchAuthTab('login')">Вход</div>
+          <div class="auth-tab" onclick="switchAuthTab('register')">Регистрация</div>
+        </div>
+
+        <!-- Login Section -->
+        <div id="loginSection" class="auth-form">
+           <div class="auth-form" style="gap:12px; margin-top:8px;">
+             <input type="text" id="loginNick" class="auth-input" placeholder="Никнейм">
+             <div style="position: relative;">
+               <input type="password" id="loginPass" class="auth-input" placeholder="Пароль" style="padding-right: 40px;">
+               <button id="loginPassToggle" class="password-toggle" onclick="togglePassword('loginPass', 'loginPassToggle')">👁</button>
+             </div>
+             <button class="auth-btn" onclick="loginWithPassword()">Войти</button>
+           </div>
+        </div>
+
+        <!-- Register Section -->
+        <div id="registerSection" class="auth-form" style="display: none;">
+          <div class="auth-form" style="gap:12px;">
+            <input type="text" id="regNick" class="auth-input" placeholder="Никнейм">
+            <div style="position: relative;">
+              <input type="password" id="regPass" class="auth-input" placeholder="Пароль (мин. 8 символов)" style="padding-right: 40px;">
+              <button id="regPassToggle" class="password-toggle" onclick="togglePassword('regPass', 'regPassToggle')">👁</button>
+            </div>
+            <button class="auth-btn" onclick="registerUser()">Создать аккаунт</button>
+          </div>
+        </div>
+
+        <div id="authMsg" class="auth-msg"></div>
+      </div>
+    </div>
+
+    <!-- Welcome/Promo Overlay -->
+    <div id="welcomeMessage" class="welcome-overlay" style="display: none;">
+      <div class="welcome-card">
+        <h2 style="margin: 0 0 16px; font-size: 24px;">Подарок новичкам!</h2>
+        <p style="font-size: 16px; line-height: 1.5; color: var(--muted);">
+          Зайди во вкладку <strong>Коды</strong> и введи промокод:
+          <br>
+          <code style="display: inline-block; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px; margin-top: 8px; color: var(--accent); font-size: 1.2em;">start</code>
+        </p>
+        <button class="welcome-btn" onclick="closeWelcomeMessage()">Понял, спасибо!</button>
+      </div>
+    </div>
+
+    <div id="demoEmail" class="demo-email-overlay" style="display: none;">
+      <div class="demo-email-title">
+        Входящее письмо
+        <span class="demo-email-close" onclick="closeDemoEmail()">×</span>
+      </div>
+      <div class="demo-email-desc">От: КотоКазино</div>
+      <div class="demo-email-code" id="demoEmailCode">000000</div>
+      <div class="demo-email-desc">
+        <i>Это симуляция отправки письма, так как сайт работает без сервера. Введите этот код для продолжения.</i>
+      </div>
+    </div>
+
     <div class="app">
       <header>
         <div class="title">
@@ -780,8 +1209,11 @@
         </div>
         <div class="stats">
           <div class="pill">Котейки: <strong id="balance">0</strong></div>
+          <div class="pill">Глюки: <strong id="glitchBalance">0</strong></div>
+          <div class="pill">Билетики: <strong id="ticketBalance">0</strong></div>
           <div class="pill">Ставка: <strong id="betView">0</strong></div>
           <div class="pill">Серия: <strong id="streak">0</strong></div>
+          <button class="pill" onclick="logout()" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); cursor: pointer;">Выход</button>
         </div>
       </header>
 
@@ -790,7 +1222,7 @@
         <button class="tab" data-tab="shop">Магазин</button>
         <button class="tab" data-tab="achievements">Достижения</button>
         <button class="tab" data-tab="codes">Коды</button>
-        <button class="tab" data-tab="settings">Настройки</button>
+        <button class="tab" data-tab="minigames">Мини-Игры</button>
       </nav>
 
       <main>
@@ -858,47 +1290,9 @@
             <div class="shop-status">
               <div class="shop-timer">Следующее обновление: <span id="shopTimer">--:--</span></div>
             </div>
-            <div class="shop-items" id="currentItems">
-              <div class="shop-item">
-                <div class="shop-icon">🎟️</div>
-                <div class="shop-name">Счастливый билет</div>
-                <div class="shop-price">25 000 котеек</div>
-                <button class="shop-buy">Купить</button>
-              </div>
-              <div class="shop-item">
-                <div class="shop-icon">🐟</div>
-                <div class="shop-name">Рыбная удача</div>
-                <div class="shop-price">60 000 котеек</div>
-                <button class="shop-buy">Купить</button>
-              </div>
-              <div class="shop-item">
-                <div class="shop-icon">🧶</div>
-                <div class="shop-name">Клубок фарта</div>
-                <div class="shop-price">90 000 котеек</div>
-                <button class="shop-buy">Купить</button>
-              </div>
-            </div>
+            <div class="shop-items" id="currentItems"></div>
             <h3>Скоро в продаже</h3>
-            <div class="shop-items future" id="futureItems">
-              <div class="shop-item disabled">
-                <div class="shop-icon">❓</div>
-                <div class="shop-name">Скоро...</div>
-                <div class="shop-price">?</div>
-                <button class="shop-buy" disabled>Скоро</button>
-              </div>
-              <div class="shop-item disabled">
-                <div class="shop-icon">❓</div>
-                <div class="shop-name">Скоро...</div>
-                <div class="shop-price">?</div>
-                <button class="shop-buy" disabled>Скоро</button>
-              </div>
-              <div class="shop-item disabled">
-                <div class="shop-icon">❓</div>
-                <div class="shop-name">Скоро...</div>
-                <div class="shop-price">?</div>
-                <button class="shop-buy" disabled>Скоро</button>
-              </div>
-            </div>
+            <div class="shop-items future" id="futureItems"></div>
           </section>
         </div>
 
@@ -922,54 +1316,89 @@
             </div>
           </section>
         </div>
-        <div class="page" data-page="settings">
-          <section class="panel" aria-label="Настройки">
-            <div class="settings-section">
-              <h2>Настройки изображений</h2>
-              <label>
-                Изображение пустой миски
-                <input id="bowlImageInput" type="text" placeholder="миска.jpg" value="миска.jpg" />
-                <button id="bowlImageBtn" class="code-button">Применить</button>
-              </label>
-              <div id="bowlImageMsg" class="msg" style="margin-top: 12px;">Измените путь к изображению миски</div>
+
+        <div class="page" data-page="minigames">
+          <section class="panel" aria-label="Мини-Игры">
+            <h2>Мини-Игры</h2>
+            <p style="color: var(--muted); margin-bottom: 20px;">Используйте Билетики для игры!</p>
+            
+            <div class="shop-items">
+              <div class="shop-item">
+                <div class="shop-icon">💣</div>
+                <div class="shop-name">Сапер</div>
+                <div class="shop-price">1 Билетик</div>
+                <button class="shop-buy" onclick="startMinigame('sapper')">Играть</button>
+              </div>
+              <div class="shop-item disabled">
+                <div class="shop-icon">🎲</div>
+                <div class="shop-name">Кости</div>
+                <div class="shop-price">Скоро</div>
+                <button class="shop-buy" disabled>Скоро</button>
+              </div>
+            </div>
+            
+            <!-- Game area -->
+            <div id="minigameArea" style="display:none; margin-top: 20px; border-top: 1px solid var(--stroke); padding-top: 20px;">
+               <div id="sapperGame" style="text-align: center;">
+                  <h3>Сапер</h3>
+                  <p>Вскопай поле (1 Билетик = 1 клетка). Найди фигуры целиком!</p>
+                  <div style="margin: 10px 0; font-size: 14px; color: var(--muted);">
+                    Награды за полные фигуры:<br>
+                    ⬜ (1 кл) - 4 Глюка<br>
+                    ➖ (2 кл) - 3 Глюка<br>
+                    🍌 (3 кл) - 2 Глюка<br>
+                    📦 (2x2) - 1 Глюк<br>
+                    🔨 (L-форма) - 1 Глюк<br>
+                    🔑 (Код) - 15000 Котеек
+                  </div>
+                  <div id="sapperGrid" class="excavation-grid"></div>
+                  <button class="danger" onclick="stopMinigame()" style="margin-top: 20px;">Закрыть</button>
+               </div>
             </div>
           </section>
         </div>
+
       </main>
     </div>
 
     <script>
       const SYMBOLS = [
-        { key: "😺", name: "Котик", weight: 24, payout3: 3, payout2: 1 },
-        { key: "😸", name: "Улыбка", weight: 20, payout3: 4, payout2: 1 },
-        { key: "😻", name: "Любовь", weight: 16, payout3: 6, payout2: 2 },
-        { key: "😼", name: "Хитрюга", weight: 14, payout3: 9, payout2: 3 },
-        { key: "🙀", name: "Шок", weight: 10, payout3: 14, payout2: 5 },
-        { key: "😹", name: "Ржака кот", weight: 8, payout3: 22, payout2: 8 },
-        { key: "🐾", name: "Лапки", weight: 6, payout3: 35, payout2: 12 },
-        { key: "🐟", name: "Рыбка", weight: 2, payout3: 120, payout2: 40 }
+        { key: "😺", name: "Котик", weight: 24, payout3: 1.2, payout2: 0.1 },
+        { key: "😸", name: "Улыбка", weight: 20, payout3: 1.5, payout2: 0.2 },
+        { key: "😻", name: "Любовь", weight: 16, payout3: 2, payout2: 0.5 },
+        { key: "😼", name: "Хитрюга", weight: 14, payout3: 3, payout2: 0.8 },
+        { key: "🙀", name: "Шок", weight: 10, payout3: 5, payout2: 1 },
+        { key: "😹", name: "Ржака кот", weight: 8, payout3: 8, payout2: 2 },
+        { key: "🐾", name: "Лапки", weight: 6, payout3: 15, payout2: 3 },
+        { key: "🐟", name: "Рыбка", weight: 2, payout3: 30, payout2: 5 }
       ];
 
-      const WIN_CHANCE = 0.45;
-      const JACKPOT_IN_WIN_CHANCE = 0.22;
+      const WIN_CHANCE = 0.25;
+      const JACKPOT_IN_WIN_CHANCE = 0.15;
       const START_BALANCE = 0;
       const INFINITE_BALANCE = Number.MAX_SAFE_INTEGER;
       const MIN_BET = 1000;
       const MAX_BET = 500000000;
       const BET_STEP = 1000;
       const PRIZE_TIERS_IN_WIN = [
-        { chance: 0.01, mult: 100, symbol: "🐟", title: "Супер-рыбка" },
+        { chance: 0.01, mult: 40, symbol: "🐟", title: "Супер-рыбка" },
         { chance: 0.05, mult: 10, symbol: "🐾", title: "Лапки-джекпот" },
         { chance: 0.1, mult: 5, symbol: "😹", title: "Кото-угар" }
       ];
 
-      const STORAGE_KEY = "kotoslots_save";
-      const SHOP_STORAGE_KEY = "kotoslots_shop";
+      const USERS_KEY = "koto_users";
+      let STORAGE_KEY = "kotoslots_save_guest";
+      let SHOP_STORAGE_KEY = "kotoslots_shop_guest";
+      let currentUser = null;
+      let tempRegData = null;
+      let tempLoginCode = null;
 
       const els = {
         reels: document.getElementById("reels"),
         tracks: [document.getElementById("t0"), document.getElementById("t1"), document.getElementById("t2")],
         balance: document.getElementById("balance"),
+        glitchBalance: document.getElementById("glitchBalance"),
+        ticketBalance: document.getElementById("ticketBalance"),
         bet: document.getElementById("bet"),
         betInput: document.getElementById("betInput"),
         betKbd: document.getElementById("betKbd"),
@@ -993,6 +1422,15 @@
 
       const state = {
         balance: START_BALANCE,
+        glitches: 0,
+        tickets: 0,
+        epicTickets: 0,
+        legendaryTickets: 0,
+        sapper: {
+          grid: [], // { excavated: bool, shapeId: number|null }
+          shapes: [], // { id: number, type: string, cells: number[], reward: number, collected: bool }
+          codes: [] // { code: string, reward: number, used: false }
+        },
         spinning: false,
         streak: 0,
         last: ["😺", "😺", "😺"],
@@ -1003,20 +1441,18 @@
       };
 
       const shopItems = [
-        { id: 1, name: "Счастливый билет", icon: "🎟️", price: 25000, description: "+1% шанс победы на 10 спинов", effect: "win_bonus", duration: 10, value: 0.01 },
-        { id: 2, name: "Рыбная удача", icon: "🐟", price: 60000, description: "+2% шанс джекпота на 5 спинов", effect: "jackpot_bonus", duration: 5, value: 0.02 },
-        { id: 3, name: "Клубок фарта", icon: "🧶", price: 90000, description: "Защита от пустой миски на 3 спина", effect: "bowl_protection", duration: 3, value: 1 },
-        { id: 4, name: "Золотая миска", icon: "🥣", price: 120000, description: "×2 выигрыш на 8 спинов", effect: "double_win", duration: 8, value: 2 },
-        { id: 5, name: "Кошачье счастье", icon: "🍀", price: 180000, description: "Гарантированный минимальный выигрыш на 5 спинов", effect: "min_win", duration: 5, value: 1000 },
-        { id: 6, name: "Магнит для удачи", icon: "🧲", price: 250000, description: "+5% к множителю выигрыша на 10 спинов", effect: "multiplier_bonus", duration: 10, value: 0.05 },
-        { id: 7, name: "Котячий амулет", icon: "🔮", price: 350000, description: "Автоматический пересбор при проигрыше на 3 спина", effect: "reroll", duration: 3, value: 1 },
-        { id: 8, name: "Легендарная рыбка", icon: "🐠", price: 500000, description: "Мгновенный джекпот (один раз)", effect: "instant_jackpot", duration: 1, value: 100000 }
+        { id: 1, name: "Маленький сундук", icon: "📦", price: 5000, description: "1 дроп: 1-2 эпических билета и 1-6 билетиков", type: "chest", chestType: "small", drops: 1 },
+        { id: 2, name: "Средний сундук", icon: "📦", price: 20000, description: "2 дропа: 1 легендарный билет (5%), 1-3 эпических билета, 2-8 билетиков", type: "chest", chestType: "medium", drops: 2 },
+        { id: 3, name: "Большой сундук", icon: "📦", price: 30000, description: "5 дропов: 1 легендарный билет (20%), 2 легендарных (10%), 2-6 эпических билета (30%), 5-12 билетиков", type: "chest", chestType: "large", drops: 5 },
+        { id: 4, name: "Котеейки", icon: "🐱", price: 0, description: "10,000-30,000 котеек (бесплатно)", type: "currency", currencyType: "koteeks" },
+        { id: 5, name: "Билетики", icon: "🎫", price: 0, description: "3-5 билетиков (бесплатно)", type: "currency", currencyType: "tickets" },
+        { id: 6, name: "Глюки", icon: "🌀", price: 0, description: "0-3 глюка (бесплатно)", type: "currency", currencyType: "glitches" }
       ];
 
       const shopState = {
         currentItems: [],
         futureItems: [],
-        lastUpdate: null,
+        lastUpdate: 0,
         activeEffects: []
       };
 
@@ -1041,7 +1477,10 @@
       }
 
       function makeReelHtml(keys) {
-        return keys.map((k) => `<div class="reel-item"><div class="symbol">${k.includes('<img') ? k : `<span>${k}</span>`}</div></div>`).join("");
+        return keys.map((k) => {
+          const isPaw = k === "🐾";
+          return `<div class="reel-item"><div class="symbol ${isPaw ? 'paw' : ''}">${k.includes('<img') ? k : `<span>${k}</span>`}</div></div>`;
+        }).join("");
       }
 
       function renderReelsStatic() {
@@ -1059,6 +1498,9 @@
       function save() {
           const payload = {
             balance: state.balance,
+            glitches: state.glitches,
+            tickets: state.tickets,
+            sapper: state.sapper,
             streak: state.streak,
             last: state.last,
             history: state.history.slice(0, 30),
@@ -1083,6 +1525,14 @@
           if (!raw) return;
           const parsed = JSON.parse(raw);
           if (typeof parsed?.balance === "number") state.balance = parsed.balance;
+          if (typeof parsed?.glitches === "number") state.glitches = parsed.glitches;
+          if (typeof parsed?.tickets === "number") state.tickets = parsed.tickets;
+          if (parsed?.sapper && typeof parsed.sapper === 'object') {
+             state.sapper = parsed.sapper;
+             if (!state.sapper.grid) state.sapper.grid = [];
+             if (!state.sapper.shapes) state.sapper.shapes = [];
+             if (!state.sapper.codes) state.sapper.codes = [];
+          }
           if (typeof parsed?.streak === "number") state.streak = parsed.streak;
           if (Array.isArray(parsed?.last) && parsed.last.length === 3) state.last = parsed.last;
           if (Array.isArray(parsed?.history)) state.history = parsed.history.slice(0, 30);
@@ -1122,11 +1572,48 @@
       }
 
       function generateShopItems() {
-        const available = [...shopItems];
-        const shuffled = available.sort(() => Math.random() - 0.5);
+        const currentShop = [];
         
-        shopState.currentItems = shuffled.slice(0, 3);
-        shopState.futureItems = shuffled.slice(3, 6);
+        const chestRoll = Math.random();
+        if (chestRoll < 0.5) {
+          currentShop.push(shopItems.find(item => item.chestType === "small"));
+        } else if (chestRoll < 0.8) {
+          currentShop.push(shopItems.find(item => item.chestType === "medium"));
+        } else {
+          currentShop.push(shopItems.find(item => item.chestType === "large"));
+        }
+        
+        const koteeksAmount = Math.floor(Math.random() * 20001) + 10000;
+        currentShop.push({
+          ...shopItems.find(item => item.currencyType === "koteeks"),
+          price: 0,
+          amount: koteeksAmount,
+          id: Date.now() + 1
+        });
+        
+        const ticketsAmount = Math.floor(Math.random() * 3) + 3;
+        currentShop.push({
+          ...shopItems.find(item => item.currencyType === "tickets"),
+          price: 0,
+          amount: ticketsAmount,
+          id: Date.now() + 2
+        });
+        
+        const glitchRoll = Math.random();
+        if (glitchRoll < 0.3) {
+          const glitchesAmount = Math.floor(Math.random() * 4);
+          if (glitchesAmount > 0) {
+            currentShop.push({
+              ...shopItems.find(item => item.currencyType === "glitches"),
+              price: 0,
+              amount: glitchesAmount,
+              id: Date.now() + 3
+            });
+          }
+        }
+        
+        shopState.currentItems = currentShop.slice(0, 4);
+        shopState.futureItems = [];
         shopState.lastUpdate = Date.now();
         
         save();
@@ -1135,10 +1622,7 @@
       }
 
       function checkShopUpdate() {
-        const now = Date.now();
-        const hoursSinceUpdate = (now - shopState.lastUpdate) / (1000 * 60 * 60);
-        
-        if (hoursSinceUpdate >= 24) {
+        if (shopState.currentItems.length === 0) {
           generateShopItems();
         } else {
           renderShop();
@@ -1172,12 +1656,12 @@
       function renderShop() {
         if (els.currentItems) {
           els.currentItems.innerHTML = shopState.currentItems.map(item => `
-            <div class="shop-item">
+            <div class="shop-item ${item.purchased ? 'disabled' : ''}">
               <div class="shop-icon">${item.icon}</div>
               <div class="shop-name">${item.name}</div>
               <div class="shop-price">${format(item.price)}</div>
-              <button class="shop-buy" onclick="buyItem(${item.id})" ${state.balance < item.price ? 'disabled' : ''}>
-                ${state.balance < item.price ? 'Недостаточно' : 'Купить'}
+              <button class="shop-buy" onclick="buyItem(${item.id})" ${item.purchased || state.balance < item.price ? 'disabled' : ''}>
+                ${item.purchased ? 'Куплено' : (state.balance < item.price ? 'Недостаточно' : 'Купить')}
               </button>
             </div>
           `).join('');
@@ -1196,8 +1680,13 @@
       }
 
       function buyItem(itemId) {
-        const item = shopItems.find(i => i.id === itemId);
+        const item = shopState.currentItems.find(i => i.id === itemId);
         if (!item) return;
+        
+        if (item.purchased) {
+          setMessage("Этот товар уже куплен!");
+          return;
+        }
         
         if (state.balance < item.price) {
           setMessage("Недостаточно котеек!");
@@ -1205,22 +1694,76 @@
         }
         
         state.balance -= item.price;
+        item.purchased = true;
         
-        if (item.effect === "instant_jackpot") {
-          state.balance += item.value;
-          setMessage(`Получено ${format(item.value)} котеек!`);
-        } else {
-          shopState.activeEffects.push({
-            ...item,
-            activated: Date.now(),
-            spinsLeft: item.duration
-          });
-          setMessage(`${item.name} активирован!`);
+        if (item.type === "chest") {
+          openChest(item);
+        } else if (item.type === "currency") {
+          if (item.currencyType === "koteeks") {
+            state.balance += item.amount;
+            setMessage(`Получено ${format(item.amount)} котеек!`);
+          } else if (item.currencyType === "tickets") {
+            state.tickets += item.amount;
+            setMessage(`Получено ${item.amount} билетиков!`);
+          } else if (item.currencyType === "glitches") {
+            state.glitches += item.amount;
+            setMessage(`Получено ${item.amount} глюков!`);
+          }
         }
         
         save();
         render();
         renderShop();
+      }
+
+      function openChest(chest) {
+        const drops = [];
+        
+        for (let i = 0; i < chest.drops; i++) {
+          if (chest.chestType === "small") {
+            const epicAmount = Math.floor(Math.random() * 2) + 1;
+            const ticketAmount = Math.floor(Math.random() * 6) + 1;
+            state.epicTickets += epicAmount;
+            state.tickets += ticketAmount;
+            drops.push(`${epicAmount} эпик. билетов, ${ticketAmount} билетиков`);
+          } else if (chest.chestType === "medium") {
+            const legendaryRoll = Math.random();
+            if (legendaryRoll < 0.05) {
+              state.legendaryTickets += 1;
+              drops.push("1 легенд. билет");
+            } else {
+              const epicAmount = Math.floor(Math.random() * 3) + 1;
+              const ticketAmount = Math.floor(Math.random() * 7) + 2;
+              state.epicTickets += epicAmount;
+              state.tickets += ticketAmount;
+              drops.push(`${epicAmount} эпик. билетов, ${ticketAmount} билетиков`);
+            }
+          } else if (chest.chestType === "large") {
+            const legendaryRoll = Math.random();
+            if (legendaryRoll < 0.2) {
+              state.legendaryTickets += 1;
+              drops.push("1 легенд. билет");
+            } else if (legendaryRoll < 0.3) {
+              state.legendaryTickets += 2;
+              drops.push("2 легенд. билета");
+            } else {
+              const epicRoll = Math.random();
+              if (epicRoll < 0.3) {
+                const epicAmount = Math.floor(Math.random() * 5) + 2;
+                const ticketAmount = Math.floor(Math.random() * 8) + 5;
+                state.epicTickets += epicAmount;
+                state.tickets += ticketAmount;
+                drops.push(`${epicAmount} эпик. билетов, ${ticketAmount} билетиков`);
+              } else {
+                const ticketAmount = Math.floor(Math.random() * 8) + 5;
+                state.tickets += ticketAmount;
+                drops.push(`${ticketAmount} билетиков`);
+              }
+            }
+          }
+        }
+        
+        setMessage(`${chest.name} открыт! Получено: ${drops.join(", ")}`);
       }
 
       function pickDistinctKeys(count) {
@@ -1248,7 +1791,23 @@
       }
 
       function makeWinningResult() {
-        return [pickPrizeTier().symbol, pickPrizeTier().symbol, pickPrizeTier().symbol];
+        const sym = weightedPick(SYMBOLS);
+        
+        // 40% шанс на "неполный" выигрыш (2 совпадения)
+        if (Math.random() < 0.4) {
+          let other = weightedPick(SYMBOLS);
+          // Убедимся, что третий символ отличается
+          while (other.key === sym.key) {
+            other = weightedPick(SYMBOLS);
+          }
+          
+          const r = Math.random();
+          if (r < 0.33) return [sym.key, sym.key, other.key];
+          if (r < 0.66) return [sym.key, other.key, sym.key];
+          return [other.key, sym.key, sym.key];
+        }
+
+        return [sym.key, sym.key, sym.key];
       }
 
       function pickPrizeTier() {
@@ -1321,6 +1880,8 @@
 
       function render() {
         els.balance.textContent = format(state.balance);
+        if (els.glitchBalance) els.glitchBalance.textContent = format(state.glitches);
+        if (els.ticketBalance) els.ticketBalance.textContent = format(state.tickets);
         const bet = getBetValue();
         els.bet.value = String(bet);
         if (els.betInput) els.betInput.value = String(bet);
@@ -1363,7 +1924,8 @@
           })
           .join("");
         renderAchievements();
-        if (document.querySelector("#shop").classList.contains("active")) {
+        const shopPage = document.querySelector('.page[data-page="shop"]');
+        if (shopPage && shopPage.classList.contains("active")) {
           renderShop();
         }
       }
@@ -1449,14 +2011,8 @@
           setMessage(`<strong>${reason}</strong>. Накинули ${format(won)}.`);
         } else {
           state.streak = 0;
-          if (isEmptyBowl) {
-            state.balance = Math.max(0, state.balance - extraLoss);
-            setBadge("Пустая миска", "bad");
-            setMessage(`<strong>${reason}</strong>. Минус ${format(bet * 3)}.`);
-          } else {
-            setBadge("Мимо", "bad");
-            setMessage("Не повезло. Ещё раз?");
-          }
+          setBadge("Мимо", "bad");
+          setMessage("Не повезло. Ещё раз?");
         }
 
         state.last = result;
@@ -1468,23 +2024,31 @@
         if (state.balance >= 100000000 && !state.achievementShown) {
           showAchievement();
           state.achievementShown = true;
+          state.tickets += 1;
         }
         
         if (state.balance === 0 && !state.cryAchievementShown) {
           showCryAchievement();
           state.cryAchievementShown = true;
+          state.tickets += 1;
         }
         
         render();
       }
 
-      function resetAll() {
+      function resetAll(skipStorageClear = false) {
         state.balance = START_BALANCE;
+        state.glitches = 0;
+        state.tickets = 0;
+        state.sapper = { grid: [], shapes: [], codes: [] };
         state.streak = 0;
         state.last = ["😺", "😺", "😺"];
         state.history = [];
         state.achievementShown = false;
-        localStorage.removeItem(STORAGE_KEY);
+        state.startCodeUsed = false;
+        if (skipStorageClear !== true) {
+          localStorage.removeItem(STORAGE_KEY);
+        }
         setBadge("Сброшено");
         setMessage("Баланс и история сброшены.");
         render();
@@ -1513,23 +2077,57 @@
         }, 500);
       }
 
+      let codeMsgTimeout;
+
       function redeemCode() {
-        const code = els.codeInput.value.trim().toLowerCase();
-        if (code === "вертунвертун") {
+        const code = els.codeInput.value.trim();
+        if (!code) return;
+        
+        if (codeMsgTimeout) clearTimeout(codeMsgTimeout);
+        const clearMsg = () => {
+          codeMsgTimeout = setTimeout(() => { els.codeMsg.textContent = ""; }, 5000);
+        };
+
+        // Check dynamic codes first
+        if (state.sapper && state.sapper.codes) {
+           const dynCode = state.sapper.codes.find(c => c.code === code && !c.used);
+           if (dynCode) {
+             state.balance = (Number(state.balance) || 0) + dynCode.reward;
+             dynCode.used = true;
+             save();
+             render();
+             els.codeMsg.textContent = `Код активирован! +${format(dynCode.reward)} котеек`;
+             els.codeMsg.style.color = "var(--good)";
+             clearMsg();
+             return;
+           }
+        }
+
+        const lowerCode = code.toLowerCase();
+        if (lowerCode === "вертунвертун") {
           state.balance = INFINITE_BALANCE;
           els.codeMsg.textContent = "Код активирован!";
+          els.codeMsg.style.color = "var(--good)";
+          clearMsg();
           save();
           render();
-        } else if (code === "start" && !state.startCodeUsed) {
-          state.balance += 5000;
-          state.startCodeUsed = true;
-          els.codeMsg.textContent = "Код активирован! +5000 котеек";
-          save();
-          render();
-        } else if (code === "start" && state.startCodeUsed) {
-          els.codeMsg.textContent = "Этот код уже использован";
+        } else if (lowerCode === "start") {
+           if (!state.startCodeUsed) {
+             state.balance = (Number(state.balance) || 0) + 5000;
+             state.startCodeUsed = true;
+             els.codeMsg.textContent = "Код активирован! +5000 котеек";
+             els.codeMsg.style.color = "var(--good)";
+             save();
+             render();
+           } else {
+             els.codeMsg.textContent = "Этот код уже использован";
+             els.codeMsg.style.color = "var(--bad)";
+           }
+           clearMsg();
         } else {
           els.codeMsg.textContent = "Неверный код";
+          els.codeMsg.style.color = "var(--bad)";
+           clearMsg();
         }
       }
 
@@ -1555,38 +2153,358 @@
         }
       }
 
-      function init() {
+      /* Auth Logic */
+
+      function getUsers() {
+        try {
+          return JSON.parse(localStorage.getItem('kotoslots_users') || '[]');
+        } catch {
+          return [];
+        }
+      }
+
+      function saveUsers(users) {
+        localStorage.setItem('kotoslots_users', JSON.stringify(users));
+      }
+
+      function setAuthMsg(text, type = 'error') {
+        const el = document.getElementById('authMsg');
+        el.textContent = text;
+        el.className = 'auth-msg ' + type;
+      }
+
+      function togglePassword(inputId, buttonId) {
+        const input = document.getElementById(inputId);
+        const button = document.getElementById(buttonId);
+        const type = input.type === 'password' ? 'text' : 'password';
+        input.type = type;
+        button.textContent = type === 'password' ? '👁' : '👁‍🗨';
+      }
+
+      function switchAuthTab(tab) {
+        document.getElementById('loginSection').style.display = tab === 'login' ? 'flex' : 'none';
+        document.getElementById('registerSection').style.display = tab === 'register' ? 'flex' : 'none';
+        
+        const tabs = document.getElementById('mainTabs').children;
+        tabs[0].classList.toggle('active', tab === 'login');
+        tabs[1].classList.toggle('active', tab === 'register');
+        setAuthMsg('');
+      }
+
+      function registerUser() {
+        const nick = document.getElementById('regNick').value.trim();
+        const pass = document.getElementById('regPass').value;
+
+        if (!nick || !pass) return setAuthMsg('Заполните все поля');
+        if (pass.length < 8) return setAuthMsg('Пароль должен быть минимум 8 символов');
+
+        const users = getUsers();
+        if (users.find(u => u.nickname === nick)) return setAuthMsg('Никнейм уже занят');
+
+        const newUser = {
+          id: Date.now().toString(),
+          nickname: nick,
+          pass: pass, 
+          created: Date.now()
+        };
+        
+        users.push(newUser);
+        saveUsers(users);
+        
+        onLoginSuccess(newUser);
+      }
+
+      function loginWithPassword() {
+        const nick = document.getElementById('loginNick').value.trim();
+        const pass = document.getElementById('loginPass').value;
+        
+        if (!nick || !pass) return setAuthMsg('Введите ник и пароль');
+
+        const users = getUsers();
+        const user = users.find(u => u.nickname === nick && u.pass === pass);
+        
+        if (!user) return setAuthMsg('Неверный логин или пароль');
+        
+        onLoginSuccess(user);
+      }
+
+      function onLoginSuccess(user) {
+        currentUser = user;
+        STORAGE_KEY = `kotoslots_save_${user.id}`;
+        SHOP_STORAGE_KEY = `kotoslots_shop_${user.id}`;
+        localStorage.setItem('koto_last_user', user.id);
+        
+        document.getElementById('authScreen').classList.add('hidden');
+        document.querySelector('.app').classList.remove('blurred');
+        
+        // Reset state and load user data
+        resetAll(true); 
         load();
         render();
+        
+        els.msg.innerHTML = `Добро пожаловать, <strong>${user.nickname}</strong>!`;
+
+        if (!state.startCodeUsed) {
+          setTimeout(() => {
+            document.getElementById('welcomeMessage').style.display = 'flex';
+          }, 500);
+        }
+      }
+      
+      function logout() {
+        localStorage.removeItem('koto_last_user');
+        location.reload();
+      }
+
+      function closeWelcomeMessage() {
+        document.getElementById('welcomeMessage').style.display = 'none';
+      }
+
+      /* Shop Logic */
+      function buyTicket() {
+        if (state.balance >= 1000) {
+          state.balance -= 1000;
+          state.tickets = (state.tickets || 0) + 1;
+          save();
+          render();
+        }
+      }
+
+      /* Minigames Logic */
+      
+      let minigameInterval = null;
+
+      function startMinigame(gameId) {
+        if (gameId === 'sapper') {
+          document.getElementById('minigameArea').style.display = 'block';
+          initSapper();
+        }
+      }
+
+      function stopMinigame() {
+        document.getElementById('minigameArea').style.display = 'none';
+        if (minigameInterval) clearInterval(minigameInterval);
+      }
+
+      // Sapper Logic
+      function initSapper() {
+        // If grid is empty or invalid, generate new one
+        if (!state.sapper.grid || state.sapper.grid.length !== 36) {
+          generateSapperGrid();
+        }
+        renderSapperGrid();
+      }
+
+      function generateSapperGrid() {
+        const grid = new Array(36).fill(null).map((_, i) => ({ id: i, excavated: false, shapeId: null }));
+        const shapes = [];
+        let shapeIdCounter = 1;
+
+        // Helper to get coords (x,y) from index
+        const getXY = (idx) => ({ x: idx % 6, y: Math.floor(idx / 6) });
+        // Helper to get index from (x,y)
+        const getIdx = (x, y) => (x >= 0 && x < 6 && y >= 0 && y < 6) ? y * 6 + x : -1;
+
+        // Shape definitions
+        const shapeTypes = [
+          { type: 'cube', size: 4, reward: 1, name: 'Куб 2x2' },
+          { type: 'lshape', size: 4, reward: 1, name: 'L-форма' },
+          { type: 'stick3', size: 3, reward: 2, name: 'Палка 3' },
+          { type: 'stick2', size: 2, reward: 3, name: 'Палка 2' },
+          { type: 'single', size: 1, reward: 4, name: 'Клетка' },
+          { type: 'code', size: 1, reward: 15000, isCode: true, name: 'Код' }
+        ];
+
+        // Place shapes
+        for (const sType of shapeTypes) {
+           let placed = false;
+           let attempts = 0;
+           while (!placed && attempts < 100) {
+             attempts++;
+             const startIdx = Math.floor(Math.random() * 36);
+             const {x, y} = getXY(startIdx);
+             let indices = [];
+
+             if (sType.type === 'cube') { // 2x2
+                indices = [getIdx(x,y), getIdx(x+1,y), getIdx(x,y+1), getIdx(x+1,y+1)];
+             } else if (sType.type === 'lshape') { // 3 up + 1 side (rotated L)
+                // 3 vertical + 1 right bottom
+                indices = [getIdx(x,y), getIdx(x,y+1), getIdx(x,y+2), getIdx(x+1,y+2)]; 
+             } else if (sType.type === 'stick3') { // 3 vertical
+                indices = [getIdx(x,y), getIdx(x,y+1), getIdx(x,y+2)];
+             } else if (sType.type === 'stick2') { // 2 vertical
+                indices = [getIdx(x,y), getIdx(x,y+1)];
+             } else if (sType.type === 'single' || sType.type === 'code') {
+                indices = [getIdx(x,y)];
+             }
+
+             // Validate indices
+             if (indices.includes(-1)) continue; // Out of bounds
+             if (indices.some(idx => grid[idx].shapeId !== null)) continue; // Overlap
+
+             // Place
+             indices.forEach(idx => grid[idx].shapeId = shapeIdCounter);
+             shapes.push({
+               id: shapeIdCounter,
+               type: sType.type,
+               cells: indices,
+               reward: sType.reward,
+               isCode: sType.isCode || false,
+               collected: false,
+               name: sType.name
+             });
+             shapeIdCounter++;
+             placed = true;
+           }
+        }
+        
+        state.sapper.grid = grid;
+        state.sapper.shapes = shapes;
+        save();
+      }
+
+      function renderSapperGrid() {
+        const container = document.getElementById('sapperGrid');
+        container.innerHTML = '';
+        state.sapper.grid.forEach((cell, idx) => {
+           const el = document.createElement('div');
+           el.className = `excavation-cell ${cell.excavated ? 'dug' : ''}`;
+           
+           if (cell.excavated) {
+             const shape = state.sapper.shapes.find(s => s.id === cell.shapeId);
+             if (shape) {
+               if (shape.collected) {
+                 el.classList.add('found-full');
+                 el.textContent = '✅';
+               } else {
+                 el.classList.add('found');
+                 // Show icon based on type
+                 if (shape.type === 'cube') el.textContent = '📦';
+                 else if (shape.type === 'lshape') el.textContent = '🔨';
+                 else if (shape.type === 'stick3') el.textContent = '🍌';
+                 else if (shape.type === 'stick2') el.textContent = '➖';
+                 else if (shape.type === 'single') el.textContent = '⬜';
+                 else if (shape.type === 'code') el.textContent = '🔑';
+               }
+             }
+           } else {
+             el.onclick = () => digCell(idx);
+           }
+           container.appendChild(el);
+        });
+      }
+
+      function digCell(idx) {
+        if (state.sapper.grid[idx].excavated) return;
+        if ((state.tickets || 0) < 1) {
+          alert("Недостаточно билетиков! Купите их в магазине.");
+          return;
+        }
+
+        // Deduct ticket
+        state.tickets--;
+        state.sapper.grid[idx].excavated = true;
+        
+        // Anim
+        const container = document.getElementById('sapperGrid');
+        const cellEl = container.children[idx];
+        
+        // Bomb Drop
+        const bomb = document.createElement('div');
+        bomb.className = 'bomb-anim';
+        bomb.textContent = '💣';
+        cellEl.appendChild(bomb);
+
+        setTimeout(() => {
+          bomb.remove();
+          // Explosion
+          const exp = document.createElement('div');
+          exp.className = 'explosion-anim';
+          cellEl.appendChild(exp);
+          
+          setTimeout(() => {
+             exp.remove();
+             renderSapperGrid(); // Re-render to show result
+             checkShape(idx);
+             save();
+             render(); // Update tickets
+          }, 300);
+        }, 500);
+        
+        render(); // Update tickets immediately
+      }
+
+      function checkShape(idx) {
+        const cell = state.sapper.grid[idx];
+        if (!cell.shapeId) return;
+
+        const shape = state.sapper.shapes.find(s => s.id === cell.shapeId);
+        if (!shape || shape.collected) return;
+
+        // Check if all cells of this shape are excavated
+        const allDug = shape.cells.every(cIdx => state.sapper.grid[cIdx].excavated);
+        
+        if (allDug) {
+          shape.collected = true;
+          
+          if (shape.isCode) {
+             const code = 'G-' + Math.floor(Math.random()*1000000);
+             // Add to user codes logic if needed, or just show it
+             // Since user said "code generated and one-time", we can just simulate it
+             // We'll store it in a list of valid codes for this user to "redeem" automatically or manually
+             // For simplicity, we auto-redeem it or show it. 
+             // Request: "code which is generated... and for this one-time code give 15000 cats"
+             // I'll show it and auto-credit or make them enter it. 
+             // "code can be used only by the one who dug it" -> implied auto-use or personal code.
+             // I'll show an alert with the code and auto-credit for better UX or make them enter it in codes tab.
+             // Let's make them enter it to feel "real".
+             
+             // We need to store this code as "valid to redeem"
+             if (!state.sapper.codes) state.sapper.codes = [];
+             state.sapper.codes.push({ code: code, reward: shape.reward, used: false });
+             
+             alert(`Вы нашли код! 🔑\nВаш код: ${code}\nВведите его во вкладке "Коды" для получения 15,000 котеек.`);
+          } else {
+             state.glitches += shape.reward;
+             alert(`Вы нашли фигуру "${shape.name}"! +${shape.reward} Глюков`);
+          }
+          save();
+          render();
+          renderSapperGrid(); // Update to green
+        }
+      }
+      
+      /* Code Redemption Update */
+      // Modify existing verifyCode logic or wrapper?
+      // Better to hook into the existing code button logic.
+      // I'll replace the existing code button listener or modify init.
+
+      function init() {
+        // Check if user was logged in
+        const lastUserId = localStorage.getItem('koto_last_user');
+        let loggedIn = false;
+        
+        if (lastUserId) {
+          const users = getUsers();
+          const user = users.find(u => u.id === lastUserId);
+          if (user) {
+            onLoginSuccess(user);
+            loggedIn = true;
+          }
+        }
+        
+        if (!loggedIn) {
+          document.querySelector('.app').classList.add('blurred');
+          render(); // Render default state
+        }
+
         document.querySelectorAll(".tab").forEach((tab) => {
           tab.addEventListener("click", () => setTab(tab.dataset.tab));
         });
         setTab("slots");
         
-        // Initialize bowl image settings
-        const bowlImageInput = document.getElementById("bowlImageInput");
-        const bowlImageBtn = document.getElementById("bowlImageBtn");
-        const bowlImageMsg = document.getElementById("bowlImageMsg");
-        
-        if (bowlImageBtn && bowlImageInput) {
-          bowlImageBtn.addEventListener("click", () => {
-            const imagePath = bowlImageInput.value.trim();
-            if (imagePath) {
-              // Update empty bowl symbol with new image path
-              const newBowlSymbol = `<img src='${imagePath}' style='width: 42px; height: 42px; display: block; margin: 0 auto; border-radius: 8px;' alt='Пустая миска'>`;
-              // Update the constant
-              window.EMPTY_BOWL_SYMBOL = newBowlSymbol;
-              bowlImageMsg.textContent = "Изображение миски обновлено!";
-              bowlImageMsg.style.color = "var(--good)";
-              setTimeout(() => {
-                bowlImageMsg.style.color = "var(--muted)";
-              }, 2000);
-            }
-          });
-        }
-        
-        // Store initial bowl symbol globally
-        window.EMPTY_BOWL_SYMBOL = EMPTY_BOWL_SYMBOL;
+        checkShopUpdate();
+
         els.spin.addEventListener("click", () => void spin());
         if (els.reset) els.reset.addEventListener("click", resetAll);
         els.bet.addEventListener("input", () => {
