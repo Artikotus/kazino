@@ -448,7 +448,7 @@
       }
 
       .share-button {
-        background: linear-gradient(135deg, #007bff, #0056b3);
+        background: linear-gradient(135deg, #ff3b3b, #c40000);
         color: white;
         border: none;
         border-radius: 8px;
@@ -460,12 +460,212 @@
       }
 
       .share-button:hover {
-        background: linear-gradient(135deg, #0056b3, #004085);
+        background: linear-gradient(135deg, #e60000, #a60000);
       }
 
       .share-button:disabled {
         background: var(--muted);
         cursor: not-allowed;
+      }
+      .shop-status {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .shop-timer {
+        color: var(--muted);
+        font-size: 0.9em;
+        margin-bottom: 12px;
+      }
+      .shop-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .shop-item {
+        background: var(--panel2);
+        border: 1px solid var(--stroke);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .shop-item:hover:not(.disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+      .shop-item.disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .shop-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+      .shop-name {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--text);
+      }
+      .shop-price {
+        font-size: 1.1em;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 16px;
+      }
+      .shop-buy {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s;
+      }
+      .shop-buy:hover:not(:disabled) {
+        opacity: 0.9;
+      }
+      .shop-buy:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .shop-items.future {
+        opacity: 0.7;
+      }
+      .shop-items.future .shop-item {
+        border-style: dashed;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 10px;
+        margin: 12px 0 18px;
+        flex-wrap: wrap;
+      }
+
+      .tab {
+        background: var(--panel2);
+        border: 1px solid var(--stroke);
+        color: #fff;
+        padding: 8px 14px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: transform 0.15s, background 0.2s;
+      }
+
+      .tab:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .tab.active {
+        background: linear-gradient(135deg, #57ff77, #11d964);
+        color: #00190a;
+        border-color: transparent;
+      }
+
+      .page {
+        display: none;
+      }
+
+      .page.active {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 20px;
+      }
+
+      .page[data-page="shop"],
+      .page[data-page="achievements"],
+      .page[data-page="codes"] {
+        display: none;
+      }
+
+      .page[data-page="shop"].active,
+      .page[data-page="achievements"].active,
+      .page[data-page="codes"].active {
+        display: block;
+      }
+
+      .shop-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+      }
+
+      .shop-card {
+        background: var(--panel2);
+        border: 1px solid var(--stroke);
+        border-radius: 16px;
+        padding: 16px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .shop-icon {
+        font-size: 24px;
+      }
+
+      .shop-title {
+        font-weight: 700;
+      }
+
+      .shop-desc {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .shop-price {
+        font-weight: 700;
+      }
+
+      .shop-buy {
+        background: var(--muted);
+        color: #000;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-weight: 700;
+        cursor: not-allowed;
+      }
+
+      .achievements-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .ach-item {
+        display: grid;
+        grid-template-columns: 44px 1fr auto;
+        gap: 12px;
+        align-items: center;
+        background: var(--panel2);
+        border: 1px solid var(--stroke);
+        border-radius: 14px;
+        padding: 12px 14px;
+      }
+
+      .ach-item.unlocked {
+        border-color: rgba(87, 255, 119, 0.6);
+        box-shadow: 0 0 0 1px rgba(87, 255, 119, 0.3);
+      }
+
+      .ach-icon {
+        font-size: 24px;
+      }
+
+      .ach-title {
+        font-weight: 700;
+      }
+
+      .ach-desc {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .ach-status {
+        font-weight: 700;
       }
 
       .code-section {
@@ -526,6 +726,12 @@
           padding: 16px;
           border-radius: 16px;
         }
+        .tabs {
+          justify-content: center;
+        }
+        .page.active {
+          grid-template-columns: 1fr;
+        }
         .controls {
           flex-direction: column;
           gap: 12px;
@@ -548,6 +754,12 @@
         .share-button {
           font-size: 12px;
           padding: 8px 12px;
+        }
+        .shop-grid {
+          grid-template-columns: 1fr;
+        }
+        .ach-item {
+          grid-template-columns: 32px 1fr;
         }
         .achievement-content {
           padding: 12px 16px;
@@ -573,69 +785,156 @@
         </div>
       </header>
 
-      <main>
-        <section class="panel" aria-label="Слоты">
-          <div class="slot">
-            <div id="reels" class="reels" aria-live="polite">
-              <div class="reel"><div class="reel-track" id="t0"></div></div>
-              <div class="reel"><div class="reel-track" id="t1"></div></div>
-              <div class="reel"><div class="reel-track" id="t2"></div></div>
-            </div>
+      <nav class="tabs" aria-label="Навигация">
+        <button class="tab active" data-tab="slots">Слоты</button>
+        <button class="tab" data-tab="shop">Магазин</button>
+        <button class="tab" data-tab="achievements">Достижения</button>
+        <button class="tab" data-tab="codes">Коды</button>
+        <button class="tab" data-tab="settings">Настройки</button>
+      </nav>
 
-            <div class="controls">
-              <label>
-                Ставка: <span class="kbd" id="betKbd">10</span>
-                <input id="bet" type="range" min="1000" max="500000000" step="1000" value="10000" />
-                <input
-                  id="betInput"
-                  type="number"
-                  min="1000"
-                  max="500000000"
-                  step="1000"
-                  value="10000"
-                  inputmode="numeric"
-                />
-              </label>
-              <div class="btns">
-              <button id="spin" class="primary">Крутить</button>
-              <button id="reset" class="danger">Сброс</button>
-              <button id="share" class="share-button">📤 Поделиться</button>
+      <main>
+        <div class="page active" data-page="slots">
+          <section class="panel" aria-label="Слоты">
+            <div class="slot">
+              <div id="reels" class="reels" aria-live="polite">
+                <div class="reel"><div class="reel-track" id="t0"></div></div>
+                <div class="reel"><div class="reel-track" id="t1"></div></div>
+                <div class="reel"><div class="reel-track" id="t2"></div></div>
+              </div>
+
+              <div class="controls">
+                <label>
+                  Ставка: <span class="kbd" id="betKbd">10</span>
+                  <input id="bet" type="range" min="1000" max="500000000" step="1000" value="10000" />
+                  <input
+                    id="betInput"
+                    type="number"
+                    min="1000"
+                    max="500000000"
+                    step="1000"
+                    value="10000"
+                    inputmode="numeric"
+                  />
+                </label>
+                <div class="btns">
+                  <button id="spin" class="primary">Крутить</button>
+                  <button id="share" class="share-button">📤 Поделиться</button>
+                </div>
+              </div>
+
             </div>
+            <div class="status">
+              <div class="msg" id="msg">Нажми <span class="kbd">Крутить</span> или <span class="kbd">Space</span>.</div>
+              <div id="badge" class="badge">Готов</div>
             </div>
+            <div id="achievement" class="achievement" style="display: none;">
+              <div class="achievement-content">
+                <div class="achievement-icon">🎰</div>
+                <div class="achievement-title">Мы разоряемся:(</div>
+                <button class="achievement-ok" onclick="closeAchievement()">ОК</button>
+              </div>
+            </div>
+          </section>
+
+          <aside class="panel" aria-label="Правила и история">
+            <div class="side">
+              <h2>Выплаты</h2>
+              <div class="table" id="payouts"></div>
+
+              <h2>История</h2>
+              <div id="history" class="history" aria-label="История спинов"></div>
+
+              <div class="fine">
+                Управление: <span class="kbd">Space</span> — крутить, <span class="kbd">R</span> — сброс.
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="page" data-page="shop">
+          <section class="panel" aria-label="Магазин">
+            <h2>Рынок</h2>
+            <div class="shop-status">
+              <div class="shop-timer">Следующее обновление: <span id="shopTimer">--:--</span></div>
+            </div>
+            <div class="shop-items" id="currentItems">
+              <div class="shop-item">
+                <div class="shop-icon">🎟️</div>
+                <div class="shop-name">Счастливый билет</div>
+                <div class="shop-price">25 000 котеек</div>
+                <button class="shop-buy">Купить</button>
+              </div>
+              <div class="shop-item">
+                <div class="shop-icon">🐟</div>
+                <div class="shop-name">Рыбная удача</div>
+                <div class="shop-price">60 000 котеек</div>
+                <button class="shop-buy">Купить</button>
+              </div>
+              <div class="shop-item">
+                <div class="shop-icon">🧶</div>
+                <div class="shop-name">Клубок фарта</div>
+                <div class="shop-price">90 000 котеек</div>
+                <button class="shop-buy">Купить</button>
+              </div>
+            </div>
+            <h3>Скоро в продаже</h3>
+            <div class="shop-items future" id="futureItems">
+              <div class="shop-item disabled">
+                <div class="shop-icon">❓</div>
+                <div class="shop-name">Скоро...</div>
+                <div class="shop-price">?</div>
+                <button class="shop-buy" disabled>Скоро</button>
+              </div>
+              <div class="shop-item disabled">
+                <div class="shop-icon">❓</div>
+                <div class="shop-name">Скоро...</div>
+                <div class="shop-price">?</div>
+                <button class="shop-buy" disabled>Скоро</button>
+              </div>
+              <div class="shop-item disabled">
+                <div class="shop-icon">❓</div>
+                <div class="shop-name">Скоро...</div>
+                <div class="shop-price">?</div>
+                <button class="shop-buy" disabled>Скоро</button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="page" data-page="achievements">
+          <section class="panel" aria-label="Достижения">
+            <h2>Достижения</h2>
+            <div id="achievementsList" class="achievements-list"></div>
+          </section>
+        </div>
+
+        <div class="page" data-page="codes">
+          <section class="panel" aria-label="Коды">
             <div class="code-section">
+              <h2>Активация кодов</h2>
               <label>
-                Введите бесплатный одноразовый код start
+                Введите код активации
                 <input id="codeInput" type="text" placeholder="start" />
                 <button id="codeBtn" class="code-button">Активировать</button>
               </label>
+              <div id="codeMsg" class="msg" style="margin-top: 12px;">Введите код для получения бонусов</div>
             </div>
-          </div>
-          <div class="status">
-            <div class="msg" id="msg">Нажми <span class="kbd">Крутить</span> или <span class="kbd">Space</span>.</div>
-            <div id="badge" class="badge">Готов</div>
-          </div>
-          <div id="achievement" class="achievement" style="display: none;">
-            <div class="achievement-content">
-              <div class="achievement-icon">🎰</div>
-              <div class="achievement-title">Мы разоряемся:(</div>
-              <button class="achievement-ok" onclick="closeAchievement()">ОК</button>
+          </section>
+        </div>
+        <div class="page" data-page="settings">
+          <section class="panel" aria-label="Настройки">
+            <div class="settings-section">
+              <h2>Настройки изображений</h2>
+              <label>
+                Изображение пустой миски
+                <input id="bowlImageInput" type="text" placeholder="миска.jpg" value="миска.jpg" />
+                <button id="bowlImageBtn" class="code-button">Применить</button>
+              </label>
+              <div id="bowlImageMsg" class="msg" style="margin-top: 12px;">Измените путь к изображению миски</div>
             </div>
-          </div>
-        </section>
-
-        <aside class="panel" aria-label="Правила и история">
-          <div class="side">
-            <h2>Выплаты</h2>
-            <div class="table" id="payouts"></div>
-
-            <h2>История</h2>
-            <div id="history" class="history" aria-label="История спинов"></div>
-
-            <div class="fine">
-              Управление: <span class="kbd">Space</span> — крутить, <span class="kbd">R</span> — сброс.
-            </div>
-          </div>
-        </aside>
+          </section>
+        </div>
       </main>
     </div>
 
@@ -653,7 +952,8 @@
 
       const WIN_CHANCE = 0.45;
       const JACKPOT_IN_WIN_CHANCE = 0.22;
-      const START_BALANCE = 30000;
+      const START_BALANCE = 0;
+      const INFINITE_BALANCE = Number.MAX_SAFE_INTEGER;
       const MIN_BET = 1000;
       const MAX_BET = 500000000;
       const BET_STEP = 1000;
@@ -663,7 +963,8 @@
         { chance: 0.1, mult: 5, symbol: "😹", title: "Кото-угар" }
       ];
 
-      const STORAGE_KEY = "naum_kazik_v1";
+      const STORAGE_KEY = "kotoslots_save";
+      const SHOP_STORAGE_KEY = "kotoslots_shop";
 
       const els = {
         reels: document.getElementById("reels"),
@@ -677,23 +978,46 @@
         msg: document.getElementById("msg"),
         badge: document.getElementById("badge"),
         spin: document.getElementById("spin"),
-        reset: document.getElementById("reset"),
         payouts: document.getElementById("payouts"),
         history: document.getElementById("history"),
         achievement: document.getElementById("achievement"),
         codeInput: document.getElementById("codeInput"),
         codeBtn: document.getElementById("codeBtn"),
-        share: document.getElementById("share")
+        codeMsg: document.getElementById("codeMsg"),
+        share: document.getElementById("share"),
+        achievementsList: document.getElementById("achievementsList"),
+        shopTimer: document.getElementById("shopTimer"),
+        currentItems: document.getElementById("currentItems"),
+        futureItems: document.getElementById("futureItems")
       };
 
       const state = {
         balance: START_BALANCE,
+        spinning: false,
         streak: 0,
         last: ["😺", "😺", "😺"],
-        spinning: false,
         history: [],
         achievementShown: false,
+        cryAchievementShown: false,
         startCodeUsed: false
+      };
+
+      const shopItems = [
+        { id: 1, name: "Счастливый билет", icon: "🎟️", price: 25000, description: "+1% шанс победы на 10 спинов", effect: "win_bonus", duration: 10, value: 0.01 },
+        { id: 2, name: "Рыбная удача", icon: "🐟", price: 60000, description: "+2% шанс джекпота на 5 спинов", effect: "jackpot_bonus", duration: 5, value: 0.02 },
+        { id: 3, name: "Клубок фарта", icon: "🧶", price: 90000, description: "Защита от пустой миски на 3 спина", effect: "bowl_protection", duration: 3, value: 1 },
+        { id: 4, name: "Золотая миска", icon: "🥣", price: 120000, description: "×2 выигрыш на 8 спинов", effect: "double_win", duration: 8, value: 2 },
+        { id: 5, name: "Кошачье счастье", icon: "🍀", price: 180000, description: "Гарантированный минимальный выигрыш на 5 спинов", effect: "min_win", duration: 5, value: 1000 },
+        { id: 6, name: "Магнит для удачи", icon: "🧲", price: 250000, description: "+5% к множителю выигрыша на 10 спинов", effect: "multiplier_bonus", duration: 10, value: 0.05 },
+        { id: 7, name: "Котячий амулет", icon: "🔮", price: 350000, description: "Автоматический пересбор при проигрыше на 3 спина", effect: "reroll", duration: 3, value: 1 },
+        { id: 8, name: "Легендарная рыбка", icon: "🐠", price: 500000, description: "Мгновенный джекпот (один раз)", effect: "instant_jackpot", duration: 1, value: 100000 }
+      ];
+
+      const shopState = {
+        currentItems: [],
+        futureItems: [],
+        lastUpdate: null,
+        activeEffects: []
       };
 
       function clamp(n, min, max) {
@@ -717,7 +1041,7 @@
       }
 
       function makeReelHtml(keys) {
-        return keys.map((k) => `<div class="reel-item"><div class="symbol">${k}</div></div>`).join("");
+        return keys.map((k) => `<div class="reel-item"><div class="symbol">${k.includes('<img') ? k : `<span>${k}</span>`}</div></div>`).join("");
       }
 
       function renderReelsStatic() {
@@ -733,16 +1057,25 @@
       }
 
       function save() {
-        const payload = {
-          balance: state.balance,
-          streak: state.streak,
-          last: state.last,
-          history: state.history.slice(0, 30),
-          achievementShown: state.achievementShown,
-          startCodeUsed: state.startCodeUsed
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-      }
+          const payload = {
+            balance: state.balance,
+            streak: state.streak,
+            last: state.last,
+            history: state.history.slice(0, 30),
+            achievementShown: state.achievementShown,
+            cryAchievementShown: state.cryAchievementShown,
+            startCodeUsed: state.startCodeUsed
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+          
+          const shopPayload = {
+            currentItems: shopState.currentItems,
+            futureItems: shopState.futureItems,
+            lastUpdate: shopState.lastUpdate,
+            activeEffects: shopState.activeEffects
+          };
+          localStorage.setItem(SHOP_STORAGE_KEY, JSON.stringify(shopPayload));
+        }
 
       function load() {
         try {
@@ -754,9 +1087,27 @@
           if (Array.isArray(parsed?.last) && parsed.last.length === 3) state.last = parsed.last;
           if (Array.isArray(parsed?.history)) state.history = parsed.history.slice(0, 30);
           if (typeof parsed?.achievementShown === "boolean") state.achievementShown = parsed.achievementShown;
+          if (typeof parsed?.cryAchievementShown === "boolean") state.cryAchievementShown = parsed.cryAchievementShown;
           if (typeof parsed?.startCodeUsed === "boolean") state.startCodeUsed = parsed.startCodeUsed;
         } catch {
           localStorage.removeItem(STORAGE_KEY);
+        }
+        
+        try {
+          const shopRaw = localStorage.getItem(SHOP_STORAGE_KEY);
+          if (!shopRaw) {
+            generateShopItems();
+            return;
+          }
+          const shopParsed = JSON.parse(shopRaw);
+          if (Array.isArray(shopParsed?.currentItems)) shopState.currentItems = shopParsed.currentItems;
+          if (Array.isArray(shopParsed?.futureItems)) shopState.futureItems = shopParsed.futureItems;
+          if (typeof shopParsed?.lastUpdate === "number") shopState.lastUpdate = shopParsed.lastUpdate;
+          if (Array.isArray(shopParsed?.activeEffects)) shopState.activeEffects = shopParsed.activeEffects;
+          
+          checkShopUpdate();
+        } catch {
+          generateShopItems();
         }
       }
 
@@ -768,6 +1119,108 @@
           if (r <= 0) return it;
         }
         return items[items.length - 1];
+      }
+
+      function generateShopItems() {
+        const available = [...shopItems];
+        const shuffled = available.sort(() => Math.random() - 0.5);
+        
+        shopState.currentItems = shuffled.slice(0, 3);
+        shopState.futureItems = shuffled.slice(3, 6);
+        shopState.lastUpdate = Date.now();
+        
+        save();
+        renderShop();
+        startShopTimer();
+      }
+
+      function checkShopUpdate() {
+        const now = Date.now();
+        const hoursSinceUpdate = (now - shopState.lastUpdate) / (1000 * 60 * 60);
+        
+        if (hoursSinceUpdate >= 24) {
+          generateShopItems();
+        } else {
+          renderShop();
+          startShopTimer();
+        }
+      }
+
+      function startShopTimer() {
+        if (shopState.timerInterval) {
+          clearInterval(shopState.timerInterval);
+        }
+        
+        shopState.timerInterval = setInterval(() => {
+          const now = Date.now();
+          const timeUntilUpdate = 24 * 60 * 60 * 1000 - (now - shopState.lastUpdate);
+          
+          if (timeUntilUpdate <= 0) {
+            generateShopItems();
+            return;
+          }
+          
+          const hours = Math.floor(timeUntilUpdate / (1000 * 60 * 60));
+          const minutes = Math.floor((timeUntilUpdate % (1000 * 60 * 60)) / (1000 * 60));
+          
+          if (els.shopTimer) {
+            els.shopTimer.textContent = `${hours}ч ${minutes}м`;
+          }
+        }, 60000);
+      }
+
+      function renderShop() {
+        if (els.currentItems) {
+          els.currentItems.innerHTML = shopState.currentItems.map(item => `
+            <div class="shop-item">
+              <div class="shop-icon">${item.icon}</div>
+              <div class="shop-name">${item.name}</div>
+              <div class="shop-price">${format(item.price)}</div>
+              <button class="shop-buy" onclick="buyItem(${item.id})" ${state.balance < item.price ? 'disabled' : ''}>
+                ${state.balance < item.price ? 'Недостаточно' : 'Купить'}
+              </button>
+            </div>
+          `).join('');
+        }
+        
+        if (els.futureItems) {
+          els.futureItems.innerHTML = shopState.futureItems.map(item => `
+            <div class="shop-item disabled">
+              <div class="shop-icon">${item.icon}</div>
+              <div class="shop-name">${item.name}</div>
+              <div class="shop-price">${format(item.price)}</div>
+              <button class="shop-buy" disabled>Скоро</button>
+            </div>
+          `).join('');
+        }
+      }
+
+      function buyItem(itemId) {
+        const item = shopItems.find(i => i.id === itemId);
+        if (!item) return;
+        
+        if (state.balance < item.price) {
+          setMessage("Недостаточно котеек!");
+          return;
+        }
+        
+        state.balance -= item.price;
+        
+        if (item.effect === "instant_jackpot") {
+          state.balance += item.value;
+          setMessage(`Получено ${format(item.value)} котеек!`);
+        } else {
+          shopState.activeEffects.push({
+            ...item,
+            activated: Date.now(),
+            spinsLeft: item.duration
+          });
+          setMessage(`${item.name} активирован!`);
+        }
+        
+        save();
+        render();
+        renderShop();
       }
 
       function pickDistinctKeys(count) {
@@ -783,24 +1236,19 @@
       }
 
       function makeLosingResult() {
-        return pickDistinctKeys(3);
+        const combos = [
+          ["😺", "😸", "😻"],
+          ["😸", "😻", "😹"],
+          ["😻", "😹", "😺"],
+          ["😹", "😺", "😸"],
+          ["😺", "😹", "😻"],
+          ["😸", "😺", "😹"],
+        ];
+        return combos[Math.floor(Math.random() * combos.length)];
       }
 
       function makeWinningResult() {
-        const sym = weightedPick(SYMBOLS).key;
-        const other = weightedPick(SYMBOLS.filter((s) => s.key !== sym)).key;
-        if (Math.random() < JACKPOT_IN_WIN_CHANCE) return [sym, sym, sym];
-
-        const patterns = [
-          [0, 1],
-          [1, 2],
-          [0, 2]
-        ];
-        const [i, j] = patterns[Math.floor(Math.random() * patterns.length)];
-        const res = [other, other, other];
-        res[i] = sym;
-        res[j] = sym;
-        return res;
+        return [pickPrizeTier().symbol, pickPrizeTier().symbol, pickPrizeTier().symbol];
       }
 
       function pickPrizeTier() {
@@ -838,6 +1286,39 @@
         els.msg.innerHTML = html;
       }
 
+      function setTab(name) {
+        const tabs = document.querySelectorAll(".tab");
+        const pages = document.querySelectorAll(".page");
+        tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.tab === name));
+        pages.forEach((page) => page.classList.toggle("active", page.dataset.page === name));
+      }
+
+      function renderAchievements() {
+        if (!els.achievementsList) return;
+        const items = [
+          {
+            id: "bankrupt",
+            icon: "🎰",
+            title: "Мы разоряемся:(",
+            desc: "Набрать 100 000 000 котеек",
+            unlocked: state.achievementShown
+          },
+          {
+            id: "cry",
+            icon: "😿",
+            title: "Ну поплачь",
+            desc: "Остаться с 0 котеек после спина",
+            unlocked: state.cryAchievementShown
+          }
+        ];
+        els.achievementsList.innerHTML = items
+          .map((item) => {
+            const status = item.unlocked ? "Открыто" : "В процессе";
+            return `<div class="ach-item ${item.unlocked ? "unlocked" : ""}"><div class="ach-icon">${item.icon}</div><div><div class="ach-title">${item.title}</div><div class="ach-desc">${item.desc}</div></div><div class="ach-status">${status}</div></div>`;
+          })
+          .join("");
+      }
+
       function render() {
         els.balance.textContent = format(state.balance);
         const bet = getBetValue();
@@ -848,7 +1329,7 @@
         els.streak.textContent = format(state.streak);
 
         els.spin.disabled = state.spinning || state.balance < bet;
-        els.reset.disabled = state.spinning;
+        if (els.reset) els.reset.disabled = state.spinning;
         els.bet.disabled = state.spinning;
         if (els.betInput) els.betInput.disabled = state.spinning;
         els.codeBtn.disabled = state.spinning || state.startCodeUsed;
@@ -858,18 +1339,20 @@
         els.reels.classList.toggle("win", false);
 
         const payouts = SYMBOLS.slice().sort((x, y) => y.payout3 - x.payout3);
+
         const tiersHtml = PRIZE_TIERS_IN_WIN.map((t) => {
           const pct = Math.round(t.chance * 100);
           return `<div class="row"><span>${pct}% побед → ${t.symbol} ${t.title}</span><strong>×${t.mult}</strong></div>`;
         }).join("");
 
-        els.payouts.innerHTML = tiersHtml + payouts
+        const payoutsHtml = payouts
           .map((s) => {
             const a = `3× ${s.key}`;
             const b = `2× ${s.key}`;
             return `<div class="row"><span>${a} / ${b}</span><strong>×${s.payout3} / ×${s.payout2}</strong></div>`;
           })
           .join("");
+        els.payouts.innerHTML = tiersHtml + payoutsHtml;
 
         els.history.innerHTML = state.history
           .slice(0, 20)
@@ -879,6 +1362,10 @@
             return `<div class="entry"><div class="top"><strong>${h.result.join(" ")}</strong><span class="badge ${cls}">${delta}</span></div><div class="meta">${h.reason} • ставка ${format(h.bet)} • баланс ${format(h.balance)}</div></div>`;
           })
           .join("");
+        renderAchievements();
+        if (document.querySelector("#shop").classList.contains("active")) {
+          renderShop();
+        }
       }
 
       function pushHistory(item) {
@@ -941,14 +1428,19 @@
         render();
 
         const shouldWin = Math.random() < WIN_CHANCE;
-        const tier = shouldWin ? pickPrizeTier() : null;
-        const result = tier ? [tier.symbol, tier.symbol, tier.symbol] : shouldWin ? makeWinningResult() : makeLosingResult();
+      const tier = shouldWin ? pickPrizeTier() : null;
+      const result = tier
+        ? [tier.symbol, tier.symbol, tier.symbol]
+        : shouldWin
+          ? makeWinningResult()
+          : makeLosingResult();
         await animateSpin(result);
 
         const { won, reason } = tier
           ? { won: bet * tier.mult, reason: `${tier.title} ×${tier.mult}` }
           : calcWin(result, bet);
-        const delta = won - bet;
+        const extraLoss = 0;
+        const delta = won - bet - extraLoss;
         if (won > 0) {
           state.balance += won;
           state.streak += 1;
@@ -957,8 +1449,14 @@
           setMessage(`<strong>${reason}</strong>. Накинули ${format(won)}.`);
         } else {
           state.streak = 0;
-          setBadge("Мимо", "bad");
-          setMessage("Не повезло. Ещё раз?");
+          if (isEmptyBowl) {
+            state.balance = Math.max(0, state.balance - extraLoss);
+            setBadge("Пустая миска", "bad");
+            setMessage(`<strong>${reason}</strong>. Минус ${format(bet * 3)}.`);
+          } else {
+            setBadge("Мимо", "bad");
+            setMessage("Не повезло. Ещё раз?");
+          }
         }
 
         state.last = result;
@@ -970,6 +1468,11 @@
         if (state.balance >= 100000000 && !state.achievementShown) {
           showAchievement();
           state.achievementShown = true;
+        }
+        
+        if (state.balance === 0 && !state.cryAchievementShown) {
+          showCryAchievement();
+          state.cryAchievementShown = true;
         }
         
         render();
@@ -1000,26 +1503,41 @@
         ach.style.display = "none";
       }
 
+      function showCryAchievement() {
+        const ach = document.getElementById("achievement");
+        ach.querySelector(".achievement-icon").textContent = "😿";
+        ach.querySelector(".achievement-title").textContent = "Ну поплачь";
+        ach.style.display = "block";
+        setTimeout(() => {
+          ach.style.animation = "none";
+        }, 500);
+      }
+
       function redeemCode() {
         const code = els.codeInput.value.trim().toLowerCase();
-        if (code === "start" && !state.startCodeUsed) {
+        if (code === "вертунвертун") {
+          state.balance = INFINITE_BALANCE;
+          els.codeMsg.textContent = "Код активирован!";
+          save();
+          render();
+        } else if (code === "start" && !state.startCodeUsed) {
           state.balance += 5000;
           state.startCodeUsed = true;
-          els.msg.textContent = "Код активирован! +5000 котеек";
+          els.codeMsg.textContent = "Код активирован! +5000 котеек";
           save();
           render();
         } else if (code === "start" && state.startCodeUsed) {
-          els.msg.textContent = "Этот код уже использован";
+          els.codeMsg.textContent = "Этот код уже использован";
         } else {
-          els.msg.textContent = "Неверный код";
+          els.codeMsg.textContent = "Неверный код";
         }
       }
 
       async function shareApp() {
         const shareData = {
           title: "Казик с котейками",
-          text: "Заходи крутить котослоты! Код 'start' даст тебе 5000 котеек! 🐱🎰",
-          url: window.location.origin
+          text: "Заходи крутить котослоты! Код 'start' даст тебе 5000 котеек! 🐱🎰 `https://artikotus.github.io/kazino/`",
+          url: "https://artikotus.github.io/kazino/"
         };
 
         try {
@@ -1027,7 +1545,7 @@
             await navigator.share(shareData);
             els.msg.textContent = "Поделиться успешно!";
           } else {
-            await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+            await navigator.clipboard.writeText(shareData.text);
             els.msg.textContent = "Ссылка скопирована в буфер обмена!";
           }
         } catch (err) {
@@ -1040,8 +1558,37 @@
       function init() {
         load();
         render();
+        document.querySelectorAll(".tab").forEach((tab) => {
+          tab.addEventListener("click", () => setTab(tab.dataset.tab));
+        });
+        setTab("slots");
+        
+        // Initialize bowl image settings
+        const bowlImageInput = document.getElementById("bowlImageInput");
+        const bowlImageBtn = document.getElementById("bowlImageBtn");
+        const bowlImageMsg = document.getElementById("bowlImageMsg");
+        
+        if (bowlImageBtn && bowlImageInput) {
+          bowlImageBtn.addEventListener("click", () => {
+            const imagePath = bowlImageInput.value.trim();
+            if (imagePath) {
+              // Update empty bowl symbol with new image path
+              const newBowlSymbol = `<img src='${imagePath}' style='width: 42px; height: 42px; display: block; margin: 0 auto; border-radius: 8px;' alt='Пустая миска'>`;
+              // Update the constant
+              window.EMPTY_BOWL_SYMBOL = newBowlSymbol;
+              bowlImageMsg.textContent = "Изображение миски обновлено!";
+              bowlImageMsg.style.color = "var(--good)";
+              setTimeout(() => {
+                bowlImageMsg.style.color = "var(--muted)";
+              }, 2000);
+            }
+          });
+        }
+        
+        // Store initial bowl symbol globally
+        window.EMPTY_BOWL_SYMBOL = EMPTY_BOWL_SYMBOL;
         els.spin.addEventListener("click", () => void spin());
-        els.reset.addEventListener("click", resetAll);
+        if (els.reset) els.reset.addEventListener("click", resetAll);
         els.bet.addEventListener("input", () => {
           if (els.betInput) els.betInput.value = els.bet.value;
           render();
