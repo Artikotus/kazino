@@ -1,0 +1,22 @@
+{
+  "name": "Казик с котейками",
+  "short_name": "Котослоты",
+  "description": "Котослоты на виртуальные кредиты",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0f0",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMwYTBhMGEiLz4KPHRleHQgeD0iOTYiIHk9Ijk2IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNjQiIGZpbGw9IiMwZjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPuaWh1FPUjwvdGV4dD4KPHN2ZyB4PSI0NCIgeT0iMTEyIiB3aWR0aD0iMTA0IiBoZWlnaHQ9IjQwIiB2aWV3Qm94PSIwIDAgMTA0IDQwIiBmaWxsPSJub25lIj4KPHJlY3Qgd2lkdGg9IjEwNCIgaGVpZ2h0PSI0MCIgcng9IjgiIGZpbGw9IiMwZjAiLz4KPHRleHQgeD0iNTIiIHk9IjI4IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMwYTBhMGEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPlNUQVJUPC90ZXh0Pgo8L3N2Zz4KPC9zdmc+",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iNjQiIGZpbGw9IiMwYTBhMGEiLz4KPHRleHQgeD0iMjU2IiB5PSIyNTYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNzAiIGZpbGw9IiMwZjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPuaWh1FPUjwvdGV4dD4KPHN2ZyB4PSIxMjAiIHk9IjI5NiIgd2lkdGg9IjI3MiIgaGVpZ2h0PSIxMDAiIHZpZXdCb3g9IjAgMCAyNzIgMTAwIiBmaWxsPSJub25lIj4KPHJlY3Qgd2lkdGg9IjI3MiIgaGVpZ2h0PSIxMDAiIHJ4PSIyMCIgZmlsbD0iIzBmMCIvPgo8dGV4dCB4PSIxMzYiIHk9IjcwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNDAiIGZpbGw9IiMwYTBhMGEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPlNUQVJUPC90ZXh0Pgo8L3N2Zz4KPC9zdmc+",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

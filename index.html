@@ -1,0 +1,1086 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0f0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="manifest.json" />
+    <title>Казик с котейками</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b0f14;
+        --panel: rgba(255, 255, 255, 0.06);
+        --panel2: rgba(255, 255, 255, 0.09);
+        --stroke: rgba(255, 255, 255, 0.12);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.66);
+        --good: #22c55e;
+        --bad: #ef4444;
+        --accent: #a78bfa;
+        --accent2: #60a5fa;
+        --shadow: rgba(0, 0, 0, 0.55);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans",
+          sans-serif;
+        background: radial-gradient(1200px 600px at 20% 10%, rgba(167, 139, 250, 0.22), transparent 60%),
+          radial-gradient(900px 550px at 85% 20%, rgba(96, 165, 250, 0.18), transparent 65%),
+          radial-gradient(800px 520px at 60% 90%, rgba(34, 197, 94, 0.1), transparent 60%), var(--bg);
+        color: var(--text);
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .app {
+        width: min(920px, 100%);
+        display: grid;
+        gap: 16px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border: 1px solid var(--stroke);
+        background: linear-gradient(180deg, var(--panel), rgba(255, 255, 255, 0.03));
+        border-radius: 16px;
+        box-shadow: 0 18px 60px var(--shadow);
+      }
+
+      .title {
+        display: grid;
+        gap: 2px;
+      }
+
+      .title h1 {
+        font-size: 18px;
+        margin: 0;
+        letter-spacing: 0.2px;
+      }
+
+      .title p {
+        margin: 0;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .stats {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border: 1px solid var(--stroke);
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 999px;
+        font-size: 13px;
+      }
+
+      .pill strong {
+        font-weight: 700;
+        letter-spacing: 0.2px;
+      }
+
+      main {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+
+      @media (max-width: 860px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .panel {
+        border: 1px solid var(--stroke);
+        background: linear-gradient(180deg, var(--panel), rgba(255, 255, 255, 0.03));
+        border-radius: 18px;
+        box-shadow: 0 18px 60px var(--shadow);
+        overflow: hidden;
+      }
+
+      .slot {
+        padding: 16px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .reels {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+
+      .reel {
+        border: 1px solid var(--stroke);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+        border-radius: 16px;
+        height: 168px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .reel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(120px 80px at 50% 30%, rgba(255, 255, 255, 0.14), transparent 70%);
+        pointer-events: none;
+      }
+
+      .reel::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(11, 15, 20, 0.92),
+          rgba(11, 15, 20, 0) 26%,
+          rgba(11, 15, 20, 0) 74%,
+          rgba(11, 15, 20, 0.92)
+        );
+        pointer-events: none;
+      }
+
+      .reel-track {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        transform: translateY(0px);
+        will-change: transform;
+      }
+
+      .reel-item {
+        height: 56px;
+        display: grid;
+        place-items: center;
+      }
+
+      .symbol {
+        font-size: 54px;
+        line-height: 1;
+        transform: translateZ(0);
+        filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.35));
+      }
+
+      .win .reel {
+        border-color: rgba(34, 197, 94, 0.55);
+        box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.35), 0 18px 60px rgba(34, 197, 94, 0.12);
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      @media (max-width: 540px) {
+        .controls {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      input[type="range"] {
+        width: 100%;
+      }
+
+      input[type="number"] {
+        width: 100%;
+        appearance: textfield;
+        border: 1px solid var(--stroke);
+        background: rgba(0, 0, 0, 0.25);
+        color: var(--text);
+        padding: 10px 12px;
+        border-radius: 14px;
+        font-size: 14px;
+        outline: none;
+      }
+
+      input[type="number"]:focus {
+        border-color: rgba(167, 139, 250, 0.55);
+        box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.12);
+      }
+
+      .btns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        align-items: end;
+      }
+
+      @media (max-width: 540px) {
+        .btns {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      button {
+        appearance: none;
+        border: 1px solid var(--stroke);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        padding: 12px 12px;
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
+      }
+
+      button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      button:active:not(:disabled) {
+        transform: translateY(1px);
+      }
+
+      .primary {
+        background: linear-gradient(180deg, rgba(167, 139, 250, 0.26), rgba(96, 165, 250, 0.18));
+        border-color: rgba(167, 139, 250, 0.55);
+      }
+
+      .danger {
+        background: linear-gradient(180deg, rgba(239, 68, 68, 0.22), rgba(255, 255, 255, 0.06));
+        border-color: rgba(239, 68, 68, 0.55);
+      }
+
+      .status {
+        border-top: 1px solid var(--stroke);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .msg {
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .msg strong {
+        color: var(--text);
+      }
+
+      .badge {
+        font-size: 12px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--stroke);
+        background: rgba(255, 255, 255, 0.04);
+        white-space: nowrap;
+      }
+
+      .badge.good {
+        border-color: rgba(34, 197, 94, 0.55);
+        color: rgba(34, 197, 94, 0.95);
+      }
+
+      .badge.bad {
+        border-color: rgba(239, 68, 68, 0.55);
+        color: rgba(239, 68, 68, 0.95);
+      }
+
+      .side {
+        padding: 16px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .side h2 {
+        font-size: 14px;
+        margin: 0;
+        letter-spacing: 0.2px;
+      }
+
+      .table {
+        display: grid;
+        gap: 8px;
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border: 1px solid var(--stroke);
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 14px;
+        padding: 10px 12px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .row strong {
+        color: var(--text);
+      }
+
+      .history {
+        display: grid;
+        gap: 8px;
+        max-height: 240px;
+        overflow: auto;
+        padding-right: 2px;
+      }
+
+      .entry {
+        border: 1px solid var(--stroke);
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 14px;
+        padding: 10px 12px;
+        display: grid;
+        gap: 2px;
+        font-size: 13px;
+      }
+
+      .entry .top {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .entry .top strong {
+        letter-spacing: 0.2px;
+      }
+
+      .entry .meta {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .fine {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .kbd {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        padding: 2px 6px;
+        border-radius: 8px;
+        border: 1px solid var(--stroke);
+        background: rgba(0, 0, 0, 0.25);
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 12px;
+      }
+
+      .achievement {
+        position: absolute;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        animation: slideUp 0.5s ease-out forwards;
+      }
+
+      .achievement-content {
+        background: #111;
+        border: 2px solid #0f0;
+        border-radius: 16px;
+        padding: 14px 24px;
+        box-shadow: 0 0 24px rgba(0, 255, 0, 0.3);
+        text-align: center;
+        color: #0f0;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .achievement-icon {
+        font-size: 48px;
+        margin-bottom: 8px;
+        filter: hue-rotate(-120deg) saturate(1.5);
+      }
+
+      .achievement-title {
+        margin-bottom: 12px;
+      }
+
+      .achievement-ok {
+        background: #0f0;
+        color: #111;
+        border: none;
+        border-radius: 8px;
+        padding: 6px 20px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .achievement-ok:hover {
+        background: #0c0;
+      }
+
+      .share-button {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .share-button:hover {
+        background: linear-gradient(135deg, #0056b3, #004085);
+      }
+
+      .share-button:disabled {
+        background: var(--muted);
+        cursor: not-allowed;
+      }
+
+      .code-section {
+        margin-top: 16px;
+        text-align: center;
+      }
+
+      .code-section label {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      #codeInput {
+        padding: 8px 12px;
+        border: 1px solid var(--stroke);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-size: 14px;
+        text-align: center;
+      }
+
+      .code-button {
+        background: linear-gradient(135deg, #4CAF50, #45a049);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .code-button:hover {
+        background: linear-gradient(135deg, #45a049, #3d8b40);
+      }
+
+      .code-button:disabled {
+        background: var(--muted);
+        cursor: not-allowed;
+      }
+
+      @keyframes slideUp {
+        to {
+          bottom: 120px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          font-size: 14px;
+        }
+        .panel {
+          padding: 16px;
+          border-radius: 16px;
+        }
+        .controls {
+          flex-direction: column;
+          gap: 12px;
+        }
+        .btns {
+          flex-direction: column;
+          gap: 8px;
+        }
+        .kbd {
+          font-size: 12px;
+          padding: 4px 8px;
+        }
+        .code-section {
+          margin-top: 12px;
+        }
+        .code-button {
+          font-size: 12px;
+          padding: 6px 12px;
+        }
+        .share-button {
+          font-size: 12px;
+          padding: 8px 12px;
+        }
+        .achievement-content {
+          padding: 12px 16px;
+          font-size: 16px;
+        }
+        .achievement-icon {
+          font-size: 36px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header>
+        <div class="title">
+          <h1>Казик с котейками</h1>
+          <p>Котослоты на виртуальные кредиты</p>
+        </div>
+        <div class="stats">
+          <div class="pill">Котейки: <strong id="balance">0</strong></div>
+          <div class="pill">Ставка: <strong id="betView">0</strong></div>
+          <div class="pill">Серия: <strong id="streak">0</strong></div>
+        </div>
+      </header>
+
+      <main>
+        <section class="panel" aria-label="Слоты">
+          <div class="slot">
+            <div id="reels" class="reels" aria-live="polite">
+              <div class="reel"><div class="reel-track" id="t0"></div></div>
+              <div class="reel"><div class="reel-track" id="t1"></div></div>
+              <div class="reel"><div class="reel-track" id="t2"></div></div>
+            </div>
+
+            <div class="controls">
+              <label>
+                Ставка: <span class="kbd" id="betKbd">10</span>
+                <input id="bet" type="range" min="1000" max="500000000" step="1000" value="10000" />
+                <input
+                  id="betInput"
+                  type="number"
+                  min="1000"
+                  max="500000000"
+                  step="1000"
+                  value="10000"
+                  inputmode="numeric"
+                />
+              </label>
+              <div class="btns">
+              <button id="spin" class="primary">Крутить</button>
+              <button id="reset" class="danger">Сброс</button>
+              <button id="share" class="share-button">📤 Поделиться</button>
+            </div>
+            </div>
+            <div class="code-section">
+              <label>
+                Введите бесплатный одноразовый код start
+                <input id="codeInput" type="text" placeholder="start" />
+                <button id="codeBtn" class="code-button">Активировать</button>
+              </label>
+            </div>
+          </div>
+          <div class="status">
+            <div class="msg" id="msg">Нажми <span class="kbd">Крутить</span> или <span class="kbd">Space</span>.</div>
+            <div id="badge" class="badge">Готов</div>
+          </div>
+          <div id="achievement" class="achievement" style="display: none;">
+            <div class="achievement-content">
+              <div class="achievement-icon">🎰</div>
+              <div class="achievement-title">Мы разоряемся:(</div>
+              <button class="achievement-ok" onclick="closeAchievement()">ОК</button>
+            </div>
+          </div>
+        </section>
+
+        <aside class="panel" aria-label="Правила и история">
+          <div class="side">
+            <h2>Выплаты</h2>
+            <div class="table" id="payouts"></div>
+
+            <h2>История</h2>
+            <div id="history" class="history" aria-label="История спинов"></div>
+
+            <div class="fine">
+              Управление: <span class="kbd">Space</span> — крутить, <span class="kbd">R</span> — сброс.
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script>
+      const SYMBOLS = [
+        { key: "😺", name: "Котик", weight: 24, payout3: 3, payout2: 1 },
+        { key: "😸", name: "Улыбка", weight: 20, payout3: 4, payout2: 1 },
+        { key: "😻", name: "Любовь", weight: 16, payout3: 6, payout2: 2 },
+        { key: "😼", name: "Хитрюга", weight: 14, payout3: 9, payout2: 3 },
+        { key: "🙀", name: "Шок", weight: 10, payout3: 14, payout2: 5 },
+        { key: "😹", name: "Ржака кот", weight: 8, payout3: 22, payout2: 8 },
+        { key: "🐾", name: "Лапки", weight: 6, payout3: 35, payout2: 12 },
+        { key: "🐟", name: "Рыбка", weight: 2, payout3: 120, payout2: 40 }
+      ];
+
+      const WIN_CHANCE = 0.45;
+      const JACKPOT_IN_WIN_CHANCE = 0.22;
+      const START_BALANCE = 30000;
+      const MIN_BET = 1000;
+      const MAX_BET = 500000000;
+      const BET_STEP = 1000;
+      const PRIZE_TIERS_IN_WIN = [
+        { chance: 0.01, mult: 100, symbol: "🐟", title: "Супер-рыбка" },
+        { chance: 0.05, mult: 10, symbol: "🐾", title: "Лапки-джекпот" },
+        { chance: 0.1, mult: 5, symbol: "😹", title: "Кото-угар" }
+      ];
+
+      const STORAGE_KEY = "naum_kazik_v1";
+
+      const els = {
+        reels: document.getElementById("reels"),
+        tracks: [document.getElementById("t0"), document.getElementById("t1"), document.getElementById("t2")],
+        balance: document.getElementById("balance"),
+        bet: document.getElementById("bet"),
+        betInput: document.getElementById("betInput"),
+        betKbd: document.getElementById("betKbd"),
+        betView: document.getElementById("betView"),
+        streak: document.getElementById("streak"),
+        msg: document.getElementById("msg"),
+        badge: document.getElementById("badge"),
+        spin: document.getElementById("spin"),
+        reset: document.getElementById("reset"),
+        payouts: document.getElementById("payouts"),
+        history: document.getElementById("history"),
+        achievement: document.getElementById("achievement"),
+        codeInput: document.getElementById("codeInput"),
+        codeBtn: document.getElementById("codeBtn"),
+        share: document.getElementById("share")
+      };
+
+      const state = {
+        balance: START_BALANCE,
+        streak: 0,
+        last: ["😺", "😺", "😺"],
+        spinning: false,
+        history: [],
+        achievementShown: false,
+        startCodeUsed: false
+      };
+
+      function clamp(n, min, max) {
+        return Math.max(min, Math.min(max, n));
+      }
+
+      function normalizeBet(raw) {
+        const n = Number(raw);
+        const base = Number.isFinite(n) ? n : MIN_BET;
+        const stepped = Math.round(base / BET_STEP) * BET_STEP;
+        return clamp(stepped, MIN_BET, MAX_BET);
+      }
+
+      function getBetValue() {
+        if (els.betInput && els.betInput.value !== "") return normalizeBet(els.betInput.value);
+        return normalizeBet(els.bet.value);
+      }
+
+      function format(n) {
+        return new Intl.NumberFormat("ru-RU").format(n);
+      }
+
+      function makeReelHtml(keys) {
+        return keys.map((k) => `<div class="reel-item"><div class="symbol">${k}</div></div>`).join("");
+      }
+
+      function renderReelsStatic() {
+        if (!els.tracks?.length) return;
+        for (let i = 0; i < 3; i++) {
+          const above = weightedPick(SYMBOLS).key;
+          const center = state.last[i];
+          const below = weightedPick(SYMBOLS).key;
+          els.tracks[i].style.transition = "none";
+          els.tracks[i].style.transform = "translateY(0px)";
+          els.tracks[i].innerHTML = makeReelHtml([above, center, below]);
+        }
+      }
+
+      function save() {
+        const payload = {
+          balance: state.balance,
+          streak: state.streak,
+          last: state.last,
+          history: state.history.slice(0, 30),
+          achievementShown: state.achievementShown,
+          startCodeUsed: state.startCodeUsed
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      }
+
+      function load() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (typeof parsed?.balance === "number") state.balance = parsed.balance;
+          if (typeof parsed?.streak === "number") state.streak = parsed.streak;
+          if (Array.isArray(parsed?.last) && parsed.last.length === 3) state.last = parsed.last;
+          if (Array.isArray(parsed?.history)) state.history = parsed.history.slice(0, 30);
+          if (typeof parsed?.achievementShown === "boolean") state.achievementShown = parsed.achievementShown;
+          if (typeof parsed?.startCodeUsed === "boolean") state.startCodeUsed = parsed.startCodeUsed;
+        } catch {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      }
+
+      function weightedPick(items) {
+        const total = items.reduce((sum, it) => sum + it.weight, 0);
+        let r = Math.random() * total;
+        for (const it of items) {
+          r -= it.weight;
+          if (r <= 0) return it;
+        }
+        return items[items.length - 1];
+      }
+
+      function pickDistinctKeys(count) {
+        const pool = SYMBOLS.slice();
+        const out = [];
+        for (let i = 0; i < count; i++) {
+          const picked = weightedPick(pool);
+          out.push(picked.key);
+          const idx = pool.indexOf(picked);
+          if (idx >= 0) pool.splice(idx, 1);
+        }
+        return out;
+      }
+
+      function makeLosingResult() {
+        return pickDistinctKeys(3);
+      }
+
+      function makeWinningResult() {
+        const sym = weightedPick(SYMBOLS).key;
+        const other = weightedPick(SYMBOLS.filter((s) => s.key !== sym)).key;
+        if (Math.random() < JACKPOT_IN_WIN_CHANCE) return [sym, sym, sym];
+
+        const patterns = [
+          [0, 1],
+          [1, 2],
+          [0, 2]
+        ];
+        const [i, j] = patterns[Math.floor(Math.random() * patterns.length)];
+        const res = [other, other, other];
+        res[i] = sym;
+        res[j] = sym;
+        return res;
+      }
+
+      function pickPrizeTier() {
+        let r = Math.random();
+        for (const tier of PRIZE_TIERS_IN_WIN) {
+          r -= tier.chance;
+          if (r <= 0) return tier;
+        }
+        return null;
+      }
+
+      function calcWin(result, bet) {
+        const [a, b, c] = result;
+        const same3 = a === b && b === c;
+        const same2 = a === b || b === c || a === c;
+        if (!same2) return { won: 0, reason: "Мимо" };
+
+        const symKey = same3 ? a : a === b ? a : b === c ? b : a;
+        const sym = SYMBOLS.find((s) => s.key === symKey);
+        if (!sym) return { won: 0, reason: "Мимо" };
+
+        const mult = same3 ? sym.payout3 : sym.payout2;
+        const won = bet * mult;
+        const reason = same3 ? `Три ${sym.name} ×${mult}` : `Две ${sym.name} ×${mult}`;
+        return { won, reason };
+      }
+
+      function setBadge(text, kind) {
+        els.badge.textContent = text;
+        els.badge.classList.remove("good", "bad");
+        if (kind) els.badge.classList.add(kind);
+      }
+
+      function setMessage(html) {
+        els.msg.innerHTML = html;
+      }
+
+      function render() {
+        els.balance.textContent = format(state.balance);
+        const bet = getBetValue();
+        els.bet.value = String(bet);
+        if (els.betInput) els.betInput.value = String(bet);
+        els.betKbd.textContent = format(bet);
+        els.betView.textContent = format(bet);
+        els.streak.textContent = format(state.streak);
+
+        els.spin.disabled = state.spinning || state.balance < bet;
+        els.reset.disabled = state.spinning;
+        els.bet.disabled = state.spinning;
+        if (els.betInput) els.betInput.disabled = state.spinning;
+        els.codeBtn.disabled = state.spinning || state.startCodeUsed;
+
+        if (!state.spinning) renderReelsStatic();
+
+        els.reels.classList.toggle("win", false);
+
+        const payouts = SYMBOLS.slice().sort((x, y) => y.payout3 - x.payout3);
+        const tiersHtml = PRIZE_TIERS_IN_WIN.map((t) => {
+          const pct = Math.round(t.chance * 100);
+          return `<div class="row"><span>${pct}% побед → ${t.symbol} ${t.title}</span><strong>×${t.mult}</strong></div>`;
+        }).join("");
+
+        els.payouts.innerHTML = tiersHtml + payouts
+          .map((s) => {
+            const a = `3× ${s.key}`;
+            const b = `2× ${s.key}`;
+            return `<div class="row"><span>${a} / ${b}</span><strong>×${s.payout3} / ×${s.payout2}</strong></div>`;
+          })
+          .join("");
+
+        els.history.innerHTML = state.history
+          .slice(0, 20)
+          .map((h) => {
+            const delta = h.delta >= 0 ? `+${format(h.delta)}` : `-${format(Math.abs(h.delta))}`;
+            const cls = h.delta >= 0 ? "good" : "bad";
+            return `<div class="entry"><div class="top"><strong>${h.result.join(" ")}</strong><span class="badge ${cls}">${delta}</span></div><div class="meta">${h.reason} • ставка ${format(h.bet)} • баланс ${format(h.balance)}</div></div>`;
+          })
+          .join("");
+      }
+
+      function pushHistory(item) {
+        state.history.unshift(item);
+        state.history = state.history.slice(0, 30);
+      }
+
+      function sleep(ms) {
+        return new Promise((r) => setTimeout(r, ms));
+      }
+
+      async function animateSpin(finalResult) {
+        const itemH = 56;
+        const tracks = els.tracks;
+        if (!tracks?.length) return;
+
+        const promises = tracks.map((track, idx) => {
+          const spinCount = 22 + idx * 7;
+          const seq = [];
+          for (let i = 0; i < spinCount; i++) seq.push(weightedPick(SYMBOLS).key);
+          seq.push(finalResult[idx]);
+
+          track.style.transition = "none";
+          track.style.transform = "translateY(0px)";
+          track.innerHTML = makeReelHtml(seq);
+          track.offsetHeight;
+
+          const target = -itemH * (seq.length - 2);
+          const delay = 70 + idx * 140;
+          const dur = 900 + idx * 160;
+          const easing = "cubic-bezier(0.18, 0.78, 0.12, 1)";
+          track.style.transition = `transform ${dur}ms ${easing}`;
+
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              track.style.transform = `translateY(${target}px)`;
+            }, delay);
+            setTimeout(resolve, delay + dur + 20);
+          });
+        });
+
+        await Promise.all(promises);
+      }
+
+      async function spin() {
+        if (state.spinning) return;
+        const bet = getBetValue();
+        if (state.balance < bet) {
+          setBadge("Не хватает", "bad");
+          setMessage("Баланс меньше ставки.");
+          return;
+        }
+
+        state.spinning = true;
+        els.spin.disabled = true;
+        setBadge("Крутим…");
+        setMessage("Удачи.");
+
+        state.balance -= bet;
+        render();
+
+        const shouldWin = Math.random() < WIN_CHANCE;
+        const tier = shouldWin ? pickPrizeTier() : null;
+        const result = tier ? [tier.symbol, tier.symbol, tier.symbol] : shouldWin ? makeWinningResult() : makeLosingResult();
+        await animateSpin(result);
+
+        const { won, reason } = tier
+          ? { won: bet * tier.mult, reason: `${tier.title} ×${tier.mult}` }
+          : calcWin(result, bet);
+        const delta = won - bet;
+        if (won > 0) {
+          state.balance += won;
+          state.streak += 1;
+          els.reels.classList.toggle("win", true);
+          setBadge(`Выигрыш ${format(won)}`, "good");
+          setMessage(`<strong>${reason}</strong>. Накинули ${format(won)}.`);
+        } else {
+          state.streak = 0;
+          setBadge("Мимо", "bad");
+          setMessage("Не повезло. Ещё раз?");
+        }
+
+        state.last = result;
+        pushHistory({ result, bet, won, delta, reason, balance: state.balance, ts: Date.now() });
+        save();
+
+        state.spinning = false;
+        
+        if (state.balance >= 100000000 && !state.achievementShown) {
+          showAchievement();
+          state.achievementShown = true;
+        }
+        
+        render();
+      }
+
+      function resetAll() {
+        state.balance = START_BALANCE;
+        state.streak = 0;
+        state.last = ["😺", "😺", "😺"];
+        state.history = [];
+        state.achievementShown = false;
+        localStorage.removeItem(STORAGE_KEY);
+        setBadge("Сброшено");
+        setMessage("Баланс и история сброшены.");
+        render();
+      }
+
+      function showAchievement() {
+        const ach = document.getElementById("achievement");
+        ach.style.display = "block";
+        setTimeout(() => {
+          ach.style.animation = "none";
+        }, 500);
+      }
+
+      function closeAchievement() {
+        const ach = document.getElementById("achievement");
+        ach.style.display = "none";
+      }
+
+      function redeemCode() {
+        const code = els.codeInput.value.trim().toLowerCase();
+        if (code === "start" && !state.startCodeUsed) {
+          state.balance += 5000;
+          state.startCodeUsed = true;
+          els.msg.textContent = "Код активирован! +5000 котеек";
+          save();
+          render();
+        } else if (code === "start" && state.startCodeUsed) {
+          els.msg.textContent = "Этот код уже использован";
+        } else {
+          els.msg.textContent = "Неверный код";
+        }
+      }
+
+      async function shareApp() {
+        const shareData = {
+          title: "Казик с котейками",
+          text: "Заходи крутить котослоты! Код 'start' даст тебе 5000 котеек! 🐱🎰",
+          url: window.location.origin
+        };
+
+        try {
+          if (navigator.share && window.location.protocol !== 'file:') {
+            await navigator.share(shareData);
+            els.msg.textContent = "Поделиться успешно!";
+          } else {
+            await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+            els.msg.textContent = "Ссылка скопирована в буфер обмена!";
+          }
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            els.msg.textContent = "Не удалось поделиться";
+          }
+        }
+      }
+
+      function init() {
+        load();
+        render();
+        els.spin.addEventListener("click", () => void spin());
+        els.reset.addEventListener("click", resetAll);
+        els.bet.addEventListener("input", () => {
+          if (els.betInput) els.betInput.value = els.bet.value;
+          render();
+        });
+        if (els.betInput) {
+          els.betInput.addEventListener("input", () => {
+            const n = Number(els.betInput.value);
+            if (!Number.isFinite(n)) return;
+            const clamped = clamp(n, MIN_BET, MAX_BET);
+            els.bet.value = String(clamped);
+            els.betKbd.textContent = format(clamped);
+            els.betView.textContent = format(clamped);
+            els.spin.disabled = state.spinning || state.balance < clamped;
+          });
+          els.betInput.addEventListener("change", () => {
+            const bet = normalizeBet(els.betInput.value);
+            els.bet.value = String(bet);
+            els.betInput.value = String(bet);
+            render();
+          });
+        }
+        els.codeBtn.addEventListener("click", redeemCode);
+        els.codeInput.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") redeemCode();
+        });
+        els.share.addEventListener("click", shareApp);
+        window.addEventListener("keydown", (e) => {
+          if (e.code === "Space") {
+            e.preventDefault();
+            void spin();
+          }
+          if (e.key.toLowerCase() === "r") {
+            resetAll();
+          }
+        });
+        setBadge("Готов");
+      }
+
+      init();
+    </script>
+  </body>
+</html>
