@@ -105,16 +105,12 @@
       }
 
       main {
-        display: grid;
-        gap: 16px;
-        grid-template-columns: 1.2fr 0.8fr;
+        display: block;
         width: min(920px, 100%);
       }
 
       @media (max-width: 860px) {
-        main {
-          grid-template-columns: 1fr;
-        }
+        /* main override removed */
       }
 
       .panel {
@@ -201,13 +197,23 @@
 
       .controls {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr auto;
         gap: 10px;
+        align-items: end;
+      }
+
+      .controls button {
+        height: 48px;
+        min-width: 120px;
+        align-self: flex-end;
       }
 
       @media (max-width: 540px) {
         .controls {
           grid-template-columns: 1fr;
+        }
+        .controls button {
+          width: 100%;
         }
       }
 
@@ -498,6 +504,14 @@
       .shop-item:hover:not(.disabled) {
         transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+      .shop-item.free {
+        border-color: var(--good);
+        box-shadow: 0 0 15px rgba(34, 197, 94, 0.15);
+      }
+      .shop-item.free .shop-buy {
+        background: var(--good);
+        color: #000;
       }
       .shop-item.disabled {
         opacity: 0.6;
@@ -1352,8 +1366,8 @@
 
               <div class="controls">
                 <label>
-                  Ставка: <span class="kbd" id="betKbd">10</span>
-                  <input id="bet" type="range" min="1000" max="500000000" step="1000" value="10000" />
+                  Ставка:
+                  <input id="bet" type="range" min="0" max="1000" step="1" value="0" />
                   <input
                     id="betInput"
                     type="number"
@@ -1364,16 +1378,18 @@
                     inputmode="numeric"
                   />
                 </label>
-                <div class="btns">
-                  <button id="spin" class="primary">Крутить</button>
-                  <button id="share" class="share-button">📤 Поделиться</button>
-                </div>
+                <button id="spin" class="primary">Крутить</button>
               </div>
 
             </div>
             <div class="status">
               <div class="msg" id="msg">Нажми <span class="kbd">Крутить</span> или <span class="kbd">Space</span>.</div>
               <div id="badge" class="badge">Готов</div>
+            </div>
+            <div class="side" style="border-top: 1px solid var(--stroke);">
+              <h2>История</h2>
+              <div id="history" class="history" aria-label="История спинов"></div>
+              <button id="share" class="primary" style="width: 100%;">Поделиться</button>
             </div>
             <div id="achievement" class="achievement" style="display: none;">
               <div class="achievement-content">
@@ -1388,9 +1404,6 @@
             <div class="side">
               <h2>Выплаты</h2>
               <div class="table" id="payouts"></div>
-
-              <h2>История</h2>
-              <div id="history" class="history" aria-label="История спинов"></div>
 
               <div class="fine">
                 Управление: <span class="kbd">Space</span> — крутить, <span class="kbd">R</span> — сброс.
@@ -1495,6 +1508,31 @@
       const MIN_BET = 1000;
       const MAX_BET = 500000000;
       const BET_STEP = 1000;
+      const SLIDER_STEPS = 1000;
+
+      function getEffectiveMaxBet(balance) {
+        return Math.max(Math.min(balance, MAX_BET), MIN_BET);
+      }
+
+      function betFromSlider(val, maxBet) {
+        if (val === 0) return MIN_BET;
+        if (val >= SLIDER_STEPS) return maxBet;
+        const minLog = Math.log(MIN_BET);
+        const maxLog = Math.log(maxBet);
+        const scale = (maxLog - minLog) / SLIDER_STEPS;
+        const bet = Math.exp(minLog + scale * val);
+        return Math.round(bet / BET_STEP) * BET_STEP;
+      }
+
+      function sliderFromBet(bet, maxBet) {
+        if (bet <= MIN_BET) return 0;
+        if (bet >= maxBet) return SLIDER_STEPS;
+        const minLog = Math.log(MIN_BET);
+        const maxLog = Math.log(maxBet);
+        const scale = (maxLog - minLog) / SLIDER_STEPS;
+        return (Math.log(bet) - minLog) / scale;
+      }
+
       const PRIZE_TIERS_IN_WIN = [
         { chance: 0.01, mult: 40, symbol: "🐟", title: "Супер-рыбка" },
         { chance: 0.05, mult: 10, symbol: "🐾", title: "Лапки-джекпот" },
@@ -1516,7 +1554,6 @@
         ticketBalance: document.getElementById("ticketBalance"),
         bet: document.getElementById("bet"),
         betInput: document.getElementById("betInput"),
-        betKbd: document.getElementById("betKbd"),
         betView: document.getElementById("betView"),
         streak: document.getElementById("streak"),
         msg: document.getElementById("msg"),
@@ -1556,12 +1593,11 @@
       };
 
       const shopItems = [
-        { id: 1, name: "Маленький сундук", icon: "📦", price: 5000, description: "1 дроп: 1-2 эпических билета и 1-6 билетиков", type: "chest", chestType: "small", drops: 1 },
-        { id: 2, name: "Средний сундук", icon: "📦", price: 20000, description: "2 дропа: 1 легендарный билет (5%), 1-3 эпических билета, 2-8 билетиков", type: "chest", chestType: "medium", drops: 2 },
-        { id: 3, name: "Большой сундук", icon: "📦", price: 30000, description: "5 дропов: 1 легендарный билет (20%), 2 легендарных (10%), 2-6 эпических билета (30%), 5-12 билетиков", type: "chest", chestType: "large", drops: 5 },
+        { id: 1, name: "Маленький сундук", icon: "📦", price: 50000, description: "1 дроп: 1-2 эпических билета и 1-6 билетиков", type: "chest", chestType: "small", drops: 1 },
+        { id: 2, name: "Средний сундук", icon: "📦", price: 150000, description: "2 дропа: 1 легендарный билет (5%), 1-3 эпических билета, 2-8 билетиков", type: "chest", chestType: "medium", drops: 2 },
+        { id: 3, name: "Большой сундук", icon: "📦", price: 500000, description: "5 дропов: 1 легендарный билет (20%), 2 легендарных (10%), 2-6 эпических билета (30%), 5-12 билетиков", type: "chest", chestType: "large", drops: 5 },
         { id: 4, name: "Котеейки", icon: "🐱", price: 0, description: "10,000-30,000 котеек (бесплатно)", type: "currency", currencyType: "koteeks" },
-        { id: 5, name: "Билетики", icon: "🎫", price: 0, description: "3-5 билетиков (бесплатно)", type: "currency", currencyType: "tickets" },
-        { id: 6, name: "Глюки", icon: "🌀", price: 0, description: "0-3 глюка (бесплатно)", type: "currency", currencyType: "glitches" }
+        { id: 5, name: "Билетики", icon: "🎫", price: 0, description: "3-5 билетиков (бесплатно)", type: "currency", currencyType: "tickets" }
       ];
 
       const shopState = {
@@ -1589,27 +1625,20 @@
       }
 
       function updateBetInputs() {
-        const val = getBetValue();
-        if (els.bet) els.bet.value = val;
-        if (els.betInput) els.betInput.value = val;
-        if (els.betKbd) els.betKbd.textContent = format(val);
-        
-        // Обновляем max атрибуты динамически
-        const maxPossible = Math.max(MIN_BET, Math.min(MAX_BET, state.balance));
-        if (els.bet) els.bet.max = maxPossible;
+        // Only update input max, slider max is fixed
+        const maxPossible = getEffectiveMaxBet(state.balance);
         if (els.betInput) els.betInput.max = maxPossible;
       }
 
       function getBetValue() {
         // Получаем сырое значение, приоритет у input
-        let val = MIN_BET;
         if (els.betInput && els.betInput.value !== "") {
-          val = Number(els.betInput.value);
-        } else if (els.bet) {
-          val = Number(els.bet.value);
+          const raw = Number(els.betInput.value);
+          return normalizeBet(raw);
         }
-        
-        // Нормализуем с учетом баланса
+        // Иначе из слайдера (логарифмически)
+        const effectiveMax = getEffectiveMaxBet(state.balance);
+        const val = betFromSlider(Number(els.bet.value), effectiveMax);
         return normalizeBet(val);
       }
 
@@ -1749,7 +1778,7 @@
           currentShop.push(shopItems.find(item => item.chestType === "large"));
         }
         
-        const koteeksAmount = Math.floor(Math.random() * 20001) + 10000;
+        const koteeksAmount = (Math.floor(Math.random() * 21) + 10) * 1000;
         currentShop.push({
           ...shopItems.find(item => item.currencyType === "koteeks"),
           price: 0,
@@ -1765,19 +1794,6 @@
           id: Date.now() + 2
         });
         
-        const glitchRoll = Math.random();
-        if (glitchRoll < 0.3) {
-          const glitchesAmount = Math.floor(Math.random() * 4);
-          if (glitchesAmount > 0) {
-            currentShop.push({
-              ...shopItems.find(item => item.currencyType === "glitches"),
-              price: 0,
-              amount: glitchesAmount,
-              id: Date.now() + 3
-            });
-          }
-        }
-        
         shopState.currentItems = currentShop.slice(0, 4);
         shopState.futureItems = [];
         shopState.lastUpdate = Date.now();
@@ -1788,6 +1804,13 @@
       }
 
       function checkShopUpdate() {
+        // Force refresh if koteeks amount is not a round multiple of 1000
+        const koteeksItem = shopState.currentItems.find(i => i.currencyType === "koteeks");
+        if (koteeksItem && koteeksItem.amount % 1000 !== 0) {
+          generateShopItems();
+          return;
+        }
+
         if (shopState.currentItems.length === 0) {
           generateShopItems();
         } else {
@@ -1821,16 +1844,20 @@
 
       function renderShop() {
         if (els.currentItems) {
-          els.currentItems.innerHTML = shopState.currentItems.map(item => `
-            <div class="shop-item ${item.purchased ? 'disabled' : ''}">
+          els.currentItems.innerHTML = shopState.currentItems.map(item => {
+            const isFree = item.price === 0;
+            const priceText = isFree ? format(item.amount) + ' шт.' : format(item.price);
+            const btnText = item.purchased ? 'Куплено' : (isFree ? 'Бесплатно' : (state.balance < item.price ? 'Недостаточно' : 'Купить'));
+            return `
+            <div class="shop-item ${item.purchased ? 'disabled' : ''} ${isFree ? 'free' : ''}">
               <div class="shop-icon">${item.icon}</div>
               <div class="shop-name">${item.name}</div>
-              <div class="shop-price">${format(item.price)}</div>
-              <button class="shop-buy" onclick="buyItem(${item.id})" ${item.purchased || state.balance < item.price ? 'disabled' : ''}>
-                ${item.purchased ? 'Куплено' : (state.balance < item.price ? 'Недостаточно' : 'Купить')}
+              <div class="shop-price">${priceText}</div>
+              <button class="shop-buy" onclick="buyItem(${item.id})" ${item.purchased || (!isFree && state.balance < item.price) ? 'disabled' : ''}>
+                ${btnText}
               </button>
             </div>
-          `).join('');
+          `}).join('');
         }
         
         if (els.futureItems) {
@@ -2048,10 +2075,15 @@
         els.balance.textContent = format(state.balance);
         if (els.glitchBalance) els.glitchBalance.textContent = format(state.glitches);
         if (els.ticketBalance) els.ticketBalance.textContent = format(state.tickets);
+        
+        updateBetInputs();
+
         const bet = getBetValue();
-        els.bet.value = String(bet);
-        if (els.betInput) els.betInput.value = String(bet);
-        els.betKbd.textContent = format(bet);
+        const effectiveMax = getEffectiveMaxBet(state.balance);
+        els.bet.value = String(sliderFromBet(bet, effectiveMax));
+        if (els.betInput && document.activeElement !== els.betInput) {
+          els.betInput.value = String(bet);
+        }
         els.betView.textContent = format(bet);
         els.streak.textContent = format(state.streak);
 
@@ -2685,22 +2717,17 @@
         els.spin.addEventListener("click", () => void spin());
         if (els.reset) els.reset.addEventListener("click", resetAll);
         els.bet.addEventListener("input", () => {
-          if (els.betInput) els.betInput.value = els.bet.value;
+          const effectiveMax = getEffectiveMaxBet(state.balance);
+          const val = betFromSlider(Number(els.bet.value), effectiveMax);
+          if (els.betInput) els.betInput.value = String(val);
           render();
         });
         if (els.betInput) {
           els.betInput.addEventListener("input", () => {
-            const n = Number(els.betInput.value);
-            if (!Number.isFinite(n)) return;
-            const clamped = clamp(n, MIN_BET, MAX_BET);
-            els.bet.value = String(clamped);
-            els.betKbd.textContent = format(clamped);
-            els.betView.textContent = format(clamped);
-            els.spin.disabled = state.spinning || state.balance < clamped;
+            render();
           });
           els.betInput.addEventListener("change", () => {
-            const bet = normalizeBet(els.betInput.value);
-            els.bet.value = String(bet);
+            const bet = getBetValue();
             els.betInput.value = String(bet);
             render();
           });
