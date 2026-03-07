@@ -108,6 +108,7 @@
         display: grid;
         gap: 16px;
         grid-template-columns: 1.2fr 0.8fr;
+        width: min(920px, 100%);
       }
 
       @media (max-width: 860px) {
@@ -343,8 +344,8 @@
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        border: 1px solid var(--stroke);
-        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--accent);
+        background: rgba(167, 139, 250, 0.08);
         border-radius: 14px;
         padding: 10px 12px;
         font-size: 13px;
@@ -452,7 +453,7 @@
       }
 
       .share-button {
-        background: linear-gradient(135deg, #ff3b3b, #c40000);
+        background: var(--accent2);
         color: white;
         border: none;
         border-radius: 8px;
@@ -464,7 +465,7 @@
       }
 
       .share-button:hover {
-        background: linear-gradient(135deg, #e60000, #a60000);
+        opacity: 0.9;
       }
 
       .share-button:disabled {
@@ -546,6 +547,7 @@
         gap: 10px;
         margin: 12px 0 18px;
         flex-wrap: wrap;
+        width: min(920px, 100%);
       }
 
       .tab {
@@ -771,6 +773,119 @@
       }
       .achievement-icon {
         font-size: 36px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .app {
+        max-width: 100%;
+        padding: 20px;
+        margin: 0;
+        transform: none;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .tabs,
+      main {
+        width: 100%;
+      }
+
+      .page.active {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        gap: 20px;
+      }
+
+      /* Слот занимает всю доступную ширину */
+      .page.active > .panel:first-child {
+        flex: 1;
+        min-width: 0; /* Для корректной работы flex */
+      }
+
+      /* Боковая панель: растягиваемая, макс 25% */
+      .page.active > .panel:last-child {
+        flex: 0 0 25%;
+        max-width: 25%;
+        min-width: 250px;
+        resize: horizontal;
+        overflow: auto;
+      }
+
+      .balance-card {
+        padding: 32px;
+        border-radius: 28px;
+      }
+
+      .balance-amount {
+        font-size: 48px;
+      }
+
+      .slot-machine {
+        height: 220px;
+        border-radius: 24px;
+      }
+
+      .symbol {
+        font-size: 72px;
+      }
+
+      .reel-item {
+        height: 72px;
+      }
+
+      button {
+        padding: 16px 24px;
+        font-size: 16px;
+      }
+
+      .side {
+        padding: 24px;
+        gap: 20px;
+      }
+
+      .row {
+        padding: 16px 20px;
+        font-size: 15px;
+      }
+
+      .nav {
+        padding: 16px 32px;
+        height: 80px;
+        gap: 40px;
+      }
+
+      .nav-item {
+        font-size: 14px;
+      }
+
+      .nav-icon {
+        font-size: 28px;
+        margin-bottom: 6px;
+      }
+
+      .shop-item {
+        padding: 24px;
+      }
+
+      .shop-icon {
+        font-size: 64px;
+      }
+
+      .shop-price {
+        font-size: 1.3em;
+      }
+
+      .excavation-grid {
+        max-width: 480px;
+        gap: 6px;
+      }
+
+      .excavation-cell {
+        font-size: 28px;
+        border-radius: 6px;
       }
     }
 
@@ -1461,19 +1576,66 @@
       }
 
       function normalizeBet(raw) {
-        const n = Number(raw);
-        const base = Number.isFinite(n) ? n : MIN_BET;
-        const stepped = Math.round(base / BET_STEP) * BET_STEP;
-        return clamp(stepped, MIN_BET, MAX_BET);
+        let n = Number(raw);
+        if (!Number.isFinite(n)) n = MIN_BET;
+        
+        // Округляем до шага
+        let stepped = Math.round(n / BET_STEP) * BET_STEP;
+        
+        // Ограничиваем балансом, но не ниже минимальной ставки
+        const maxPossible = Math.max(MIN_BET, Math.min(MAX_BET, state.balance));
+        
+        return clamp(stepped, MIN_BET, maxPossible);
+      }
+
+      function updateBetInputs() {
+        const val = getBetValue();
+        if (els.bet) els.bet.value = val;
+        if (els.betInput) els.betInput.value = val;
+        if (els.betKbd) els.betKbd.textContent = format(val);
+        
+        // Обновляем max атрибуты динамически
+        const maxPossible = Math.max(MIN_BET, Math.min(MAX_BET, state.balance));
+        if (els.bet) els.bet.max = maxPossible;
+        if (els.betInput) els.betInput.max = maxPossible;
       }
 
       function getBetValue() {
-        if (els.betInput && els.betInput.value !== "") return normalizeBet(els.betInput.value);
-        return normalizeBet(els.bet.value);
+        // Получаем сырое значение, приоритет у input
+        let val = MIN_BET;
+        if (els.betInput && els.betInput.value !== "") {
+          val = Number(els.betInput.value);
+        } else if (els.bet) {
+          val = Number(els.bet.value);
+        }
+        
+        // Нормализуем с учетом баланса
+        return normalizeBet(val);
       }
 
-      function format(n) {
-        return new Intl.NumberFormat("ru-RU").format(n);
+      function render() {
+        if (els.balance) els.balance.textContent = format(state.balance);
+        if (els.glitchBalance) els.glitchBalance.textContent = state.glitches;
+        if (els.ticketBalance) els.ticketBalance.textContent = state.tickets;
+        
+        updateBetInputs();
+        
+        // Кнопка спина
+        if (els.spin) {
+          els.spin.disabled = state.spinning || state.balance < MIN_BET;
+          if (state.balance < MIN_BET) {
+             els.msg.textContent = "Недостаточно средств!";
+          }
+        }
+        
+        // Кнопка "ОК" достижения
+        if (state.achievementShown) {
+          els.achievement.style.display = "block";
+        } else {
+          els.achievement.style.display = "none";
+        }
+
+        renderShop();
       }
 
       function makeReelHtml(keys) {
@@ -1481,6 +1643,10 @@
           const isPaw = k === "🐾";
           return `<div class="reel-item"><div class="symbol ${isPaw ? 'paw' : ''}">${k.includes('<img') ? k : `<span>${k}</span>`}</div></div>`;
         }).join("");
+      }
+
+      function format(n) {
+        return new Intl.NumberFormat("ru-RU").format(n);
       }
 
       function renderReelsStatic() {
@@ -1983,6 +2149,10 @@
 
         state.spinning = true;
         els.spin.disabled = true;
+        // Блокируем ввод ставки во время спина
+        if (els.bet) els.bet.disabled = true;
+        if (els.betInput) els.betInput.disabled = true;
+        
         setBadge("Крутим…");
         setMessage("Удачи.");
 
@@ -1990,8 +2160,8 @@
         render();
 
         const shouldWin = Math.random() < WIN_CHANCE;
-      const tier = shouldWin ? pickPrizeTier() : null;
-      const result = tier
+        const tier = shouldWin ? pickPrizeTier() : null;
+        const result = tier
         ? [tier.symbol, tier.symbol, tier.symbol]
         : shouldWin
           ? makeWinningResult()
@@ -2020,6 +2190,13 @@
         save();
 
         state.spinning = false;
+        
+        // Разблокируем ввод
+        if (els.bet) els.bet.disabled = false;
+        if (els.betInput) els.betInput.disabled = false;
+        
+        // После спина баланс изменился - обновляем лимиты
+        updateBetInputs();
         
         if (state.balance >= 100000000 && !state.achievementShown) {
           showAchievement();
