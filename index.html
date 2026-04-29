@@ -4533,6 +4533,11 @@ button.setAttribute('title', type === 'password' ? 'Показать парол�
  authScreen.style.display = 'none';
  }
 
+function clearStoredAuth() {
+ localStorage.removeItem('koto_last_user');
+ localStorage.removeItem('current_user');
+}
+
  async function registerUser() {
  const rawNick = document.getElementById('regNick').value.trim();
  const nick = normalizeNickname(rawNick);
@@ -4612,8 +4617,7 @@ button.setAttribute('title', type === 'password' ? 'Показать парол�
  }
  
  // Очищаем все данные аутентификации
- localStorage.removeItem('koto_last_user');
- localStorage.removeItem('current_user');
+ clearStoredAuth();
  location.reload();
  }
 
@@ -4625,6 +4629,7 @@ button.setAttribute('title', type === 'password' ? 'Показать парол�
  currentUser = null;
  STORAGE_KEY = "kotoslots_save_guest";
  SHOP_STORAGE_KEY = "kotoslots_shop_guest";
+ clearStoredAuth();
  
  showLoading(() => {
  hideAuthScreen();
@@ -5642,22 +5647,16 @@ cat.textContent = 'К';
  try {
  const user = await apiGetCurrentUser();
  if (!user) {
- const mainMenu = document.getElementById('mainMenu');
- 
- showAuthScreen();
- if (mainMenu) {
- mainMenu.classList.add('hidden');
- }
- return;
+ clearStoredAuth();
+ currentUser = null;
+ STORAGE_KEY = "kotoslots_save_guest";
+ SHOP_STORAGE_KEY = "kotoslots_shop_guest";
  }
  } catch (error) {
- const mainMenu = document.getElementById('mainMenu');
- 
- showAuthScreen();
- if (mainMenu) {
- mainMenu.classList.add('hidden');
- }
- return;
+ clearStoredAuth();
+ currentUser = null;
+ STORAGE_KEY = "kotoslots_save_guest";
+ SHOP_STORAGE_KEY = "kotoslots_shop_guest";
  }
  }
  
