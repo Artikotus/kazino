@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Handler</title>
+</head>
+<body>
+<script>
+// Mock authentication handler for local development
+const path = new URL(window.location.href).pathname.replace('/bd/auth.php', '').replace(/^\/+/, '');
+const method = 'POST'; // All auth requests are POST
+
+if (path === 'register') {
+    // Mock registration
+    const mockUser = {
+        id: Date.now(),
+        login: 'test_user',
+        crystals: 150,
+        coins: 500,
+        created_at: new Date().toISOString()
+    };
+    localStorage.setItem('koto_user', JSON.stringify(mockUser));
+    document.body.textContent = JSON.stringify({ success: true, user: mockUser });
+} else if (path === 'login') {
+    // Mock login
+    const storedUser = localStorage.getItem('koto_user');
+    if (storedUser) {
+        document.body.textContent = JSON.stringify({ success: true, user: JSON.parse(storedUser) });
+    } else {
+        const mockUser = {
+            id: Date.now(),
+            login: 'demo_user',
+            crystals: 150,
+            coins: 500,
+            created_at: new Date().toISOString()
+        };
+        localStorage.setItem('koto_user', JSON.stringify(mockUser));
+        document.body.textContent = JSON.stringify({ success: true, user: mockUser });
+    }
+} else if (path === 'logout') {
+    localStorage.removeItem('koto_user');
+    document.body.textContent = JSON.stringify({ success: true });
+} else if (path === 'me') {
+    const storedUser = localStorage.getItem('koto_user');
+    if (storedUser) {
+        document.body.textContent = JSON.stringify({ success: true, user: JSON.parse(storedUser) });
+    } else {
+        document.body.textContent = JSON.stringify({ error: 'Not logged in' });
+    }
+} else {
+    document.body.textContent = JSON.stringify({ error: 'Route not found', path: path });
+}
+</script>
+</body>
+</html>
