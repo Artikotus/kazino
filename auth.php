@@ -12,10 +12,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-$database = 'ck60547_tema';
-$username = 'ck60547_tema';
-$password = 'M6ydrHLU';
-$host = 'localhost';
+$database = getenv('DB_NAME') ?: '';
+$username = getenv('DB_USER') ?: '';
+$password = getenv('DB_PASSWORD') ?: '';
+$host = getenv('DB_HOST') ?: 'localhost';
+
+if ($database === '' || $username === '' || $password === '') {
+    http_response_code(500);
+    echo json_encode(['error' => 'Server DB config missing', 'message' => 'Server DB config missing']);
+    exit();
+}
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$database;charset=utf8mb4", $username, $password);

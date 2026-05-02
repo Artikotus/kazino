@@ -3,7 +3,7 @@ import json
 import os
 import random
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import aiohttp
@@ -50,38 +50,9 @@ DEFAULT_BOT_SYSTEM_PROMPT = """Ты не ассистент и не объясн
 Пиши строго на русском. Только одно сообщение без кавычек."""
 
 FALLBACK_REPLIES = [
-    "норм",
-    "ок",
     "ага",
-    "го",
-    "крч да",
-    "пон",
-    "жесть",
-    "забей",
-    "имба",
-    "красава",
-    "кринж",
-    "рил",
-    "база",
-    "нормусь",
-    "топ",
-    "жиза",
-    "сочувствую",
-    "ого",
-    "ваще жесть",
-    "лол",
-    "ор",
-    "ахах",
-    "ясн",
-    "бывает",
-    "интересно",
-    "мм ок",
-    "да норм все",
-    "как вообще?",
-    "чего нового?",
-    "серьезно?",
-    "круто",
-    "дичь",
+    "как дела",
+    "конечно",
 ]
 
 BOT_STARTERS = [
@@ -98,13 +69,16 @@ BOT_STARTERS = [
     "дарова",
     "здорово",
 ]
-AUTO_BOT_WAIT_SECONDS = 7
+AUTO_BOT_WAIT_SECONDS = 0
 
 clients = {}
 online_players = {}
 chat_rooms = {}
 cached_bot_system_prompt = None
 pending_bot_match_tasks = {}
+WS_HOST = os.getenv("WS_HOST", "0.0.0.0")
+WS_PORT = int(os.getenv("WS_PORT", "8765"))
+RECONNECT_GRACE_SECONDS = int(os.getenv("CHAT_RECONNECT_GRACE_SECONDS", "20"))
 
 
 class ChatRoom:
@@ -117,6 +91,12 @@ class ChatRoom:
         self.last_activity = datetime.now()
         self.active = True
         self.waiting_for_id = None
+        self.player1_token = None
+        self.player2_token = None
+        self.player1_nickname = "Игрок"
+        self.player2_nickname = "Собеседник" if is_bot else "Игрок"
+        self.disconnect_deadlines = {1: None, 2: None}
+        self.history = []
 
 
 def load_env_file():
@@ -210,38 +190,8 @@ async def load_bot_system_prompt():
 
 
 async def get_bot_response(message, settings):
-    api_key = settings["api_key"]
-    if not api_key:
-        return random.choice(FALLBACK_REPLIES)
-
-    try:
-        bot_system_prompt = await load_bot_system_prompt()
-        async with aiohttp.ClientSession() as session:
-            resp = await session.post(
-                build_chat_url(settings["base_url"]),
-                headers={
-                    "Authorization": f"Bearer {api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": settings["model"],
-                    "messages": [
-                        {"role": "system", "content": bot_system_prompt},
-                        {"role": "user", "content": message},
-                    ],
-                    "max_tokens": 64,
-                    "temperature": 0.95,
-                    "frequency_penalty": 0.4,
-                },
-                timeout=aiohttp.ClientTimeout(total=10),
-            )
-            data = await resp.json()
-            reply = data["choices"][0]["message"]["content"].strip()
-            if not reply:
-                return random.choice(FALLBACK_REPLIES)
-            return reply[:150] if len(reply) > 150 else reply
-    except Exception:
-        return random.choice(FALLBACK_REPLIES)
+    del message, settings
+    return random.choice(FALLBACK_REPLIES)
 
 
 async def send_to_client(client_id, data):
@@ -273,6 +223,58 @@ def cancel_pending_bot_match(client_id):
         task.cancel()
 
 
+def append_room_history(room, role, message):
+    text = str(message or "").strip()
+    if not text:
+        return
+    room.history.append({"role": role, "content": text})
+    room.history = room.history[-50:]
+
+
+def get_room_side(room, client_id=None, reconnect_token=None):
+    if client_id and room.player1_id == client_id:
+        return 1
+    if client_id and room.player2_id == client_id:
+        return 2
+    if reconnect_token and room.player1_token == reconnect_token:
+        return 1
+    if reconnect_token and room.player2_token == reconnect_token:
+        return 2
+    return None
+
+
+def get_other_client_id(room, side):
+    return room.player2_id if side == 1 else room.player1_id
+
+
+def bind_client_to_room(room, side, client_id, nickname):
+    if side == 1:
+        room.player1_id = client_id
+        room.player1_nickname = nickname or room.player1_nickname
+    else:
+        room.player2_id = client_id
+        room.player2_nickname = nickname or room.player2_nickname
+    room.disconnect_deadlines[side] = None
+    room.last_activity = datetime.now()
+    clients[client_id]["room_id"] = room.room_id
+
+
+async def try_resume_room(client_id, room_id, reconnect_token):
+    room = chat_rooms.get(room_id)
+    if not room or not reconnect_token:
+        return False
+    side = get_room_side(room, reconnect_token=reconnect_token)
+    if not side:
+        return False
+    bind_client_to_room(room, side, client_id, clients[client_id].get("nickname", "Игрок"))
+    other_name = room.player2_nickname if side == 1 else room.player1_nickname
+    await send_to_client(client_id, {"type": "chat_matched", "nickname": other_name, "is_bot": room.is_bot, "room_id": room.room_id, "resumed": True, "history": room.history})
+    other_id = get_other_client_id(room, side)
+    if other_id and other_id in clients:
+        await send_to_client(other_id, {"type": "chat_partner_resumed"})
+    return True
+
+
 async def schedule_bot_match(client_id):
     try:
         await asyncio.sleep(AUTO_BOT_WAIT_SECONDS)
@@ -302,6 +304,9 @@ async def try_match(client_id, force_bot=False):
     ]
 
     if not force_bot and not other_players:
+        if AUTO_BOT_WAIT_SECONDS <= 0:
+            await try_match(client_id, force_bot=True)
+            return
         if client_id not in pending_bot_match_tasks:
             pending_bot_match_tasks[client_id] = asyncio.create_task(schedule_bot_match(client_id))
         await send_to_client(
@@ -318,6 +323,8 @@ async def try_match(client_id, force_bot=False):
 
     if force_bot:
         room = ChatRoom(room_id, client_id, None, True)
+        room.player1_token = clients[client_id].get("reconnect_token")
+        room.player1_nickname = clients[client_id].get("nickname", "Игрок")
         chat_rooms[room_id] = room
         clients[client_id]["room_id"] = room_id
 
@@ -327,6 +334,8 @@ async def try_match(client_id, force_bot=False):
                 "type": "chat_matched",
                 "nickname": "Собеседник",
                 "is_bot": True,
+                "room_id": room_id,
+                "history": room.history,
             },
         )
 
@@ -336,6 +345,7 @@ async def try_match(client_id, force_bot=False):
 
         starter = random.choice(BOT_STARTERS)
         room.last_activity = datetime.now()
+        append_room_history(room, "assistant", starter)
         await send_to_client(
             client_id,
             {
@@ -353,6 +363,10 @@ async def try_match(client_id, force_bot=False):
 
     cancel_pending_bot_match(other_id)
     room = ChatRoom(room_id, client_id, other_id, False)
+    room.player1_token = clients[client_id].get("reconnect_token")
+    room.player2_token = clients[other_id].get("reconnect_token")
+    room.player1_nickname = clients[client_id].get("nickname", "Игрок")
+    room.player2_nickname = clients[other_id].get("nickname", "Игрок")
     chat_rooms[room_id] = room
     clients[client_id]["room_id"] = room_id
     clients[other_id]["room_id"] = room_id
@@ -361,16 +375,20 @@ async def try_match(client_id, force_bot=False):
         client_id,
         {
             "type": "chat_matched",
-            "nickname": clients[other_id].get("nickname", "Игрок"),
+            "nickname": room.player2_nickname,
             "is_bot": False,
+            "room_id": room_id,
+            "history": room.history,
         },
     )
     await send_to_client(
         other_id,
         {
             "type": "chat_matched",
-            "nickname": clients[client_id].get("nickname", "Игрок"),
+            "nickname": room.player1_nickname,
             "is_bot": False,
+            "room_id": room_id,
+            "history": room.history,
         },
     )
 
@@ -404,9 +422,14 @@ async def handle_message(client_id, data):
 
     if message_type == "chat_join":
         nickname = data.get("nickname", "Гость")
+        reconnect_token = data.get("reconnect_token")
+        room_id = data.get("room_id")
         client["nickname"] = nickname
+        client["reconnect_token"] = reconnect_token
         online_players[client_id] = {"nickname": nickname}
         await broadcast_online_count()
+        if await try_resume_room(client_id, room_id, reconnect_token):
+            return
         await try_match(client_id)
 
     elif message_type == "chat_join_bot_test":
@@ -428,6 +451,7 @@ async def handle_message(client_id, data):
             return
 
         room.last_activity = datetime.now()
+        append_room_history(room, "user", text)
 
         if room.is_bot:
             await send_to_client(
@@ -444,6 +468,7 @@ async def handle_message(client_id, data):
 
             bot_reply = await get_bot_response(text, api_settings)
             room.last_activity = datetime.now()
+            append_room_history(room, "assistant", bot_reply)
             await send_to_client(
                 client_id,
                 {
@@ -500,6 +525,13 @@ async def check_idle_players():
         for room_id, room in list(chat_rooms.items()):
             if not room.active:
                 continue
+            if any(deadline and now >= deadline for deadline in room.disconnect_deadlines.values()):
+                room.active = False
+                other_id = room.player1_id or room.player2_id
+                if other_id in clients:
+                    await send_to_client(other_id, {"type": "chat_partner_left"})
+                to_remove.append(room_id)
+                continue
             if not room.is_bot and room.player2_id:
                 if not room.waiting_for_id:
                     continue
@@ -534,13 +566,16 @@ async def handle_disconnect(client_id):
 
     if room_id and room_id in chat_rooms:
         room = chat_rooms[room_id]
-        room.active = False
-        other_id = room.player2_id if client_id == room.player1_id else room.player1_id
-        if other_id and other_id in clients:
-            await send_to_client(other_id, {"type": "chat_partner_left"})
-            clients[other_id]["room_id"] = None
-        if room_id in chat_rooms:
-            del chat_rooms[room_id]
+        side = get_room_side(room, client_id=client_id)
+        if side:
+            room.disconnect_deadlines[side] = datetime.now() + timedelta(seconds=RECONNECT_GRACE_SECONDS)
+            if side == 1:
+                room.player1_id = None
+            else:
+                room.player2_id = None
+            other_id = get_other_client_id(room, side)
+            if other_id and other_id in clients:
+                await send_to_client(other_id, {"type": "chat_partner_reconnecting", "seconds": RECONNECT_GRACE_SECONDS})
 
     if client_id in online_players:
         del online_players[client_id]
@@ -552,11 +587,11 @@ async def handle_disconnect(client_id):
 async def main():
     api_settings = resolve_api_settings()
     print("WebSocket сервер 'Котобот или нет?' запускается...")
-    print("Сервер будет доступен на ws://localhost:8765")
+    print(f"Сервер будет доступен на ws://{WS_HOST}:{WS_PORT}")
     print(f"Провайдер бота: {api_settings['provider']}")
     print(f"Модель бота: {api_settings['model']}")
     asyncio.create_task(check_idle_players())
-    async with websockets.serve(handle_client, "localhost", 8765):
+    async with websockets.serve(handle_client, WS_HOST, WS_PORT):
         print("Сервер запущен и готов к подключениям!")
         await asyncio.Future()
 

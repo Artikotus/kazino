@@ -1,0 +1,7 @@
+доступ к серверу:
+СЕКРЕТЫ УДАЛЕНЫ ИЗ ПРОЕКТА
+используй локальный файл `server_access.local.env`, который не коммитится
+пример:
+HOST=your-host
+USER=your-user
+PASSWORD=your-password
