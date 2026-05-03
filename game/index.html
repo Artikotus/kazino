@@ -1,24 +1,101 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Мяу-нополия</title>
- <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дрон против котов и ПВО</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
- <div class="game-container">
- <div class="game-board" id="gameBoard">
- </div>
- <div class="game-ui">
- <div class="player-info" id="playerInfo"></div>
- <div class="dice-area">
- <button id="rollDice" class="dice-btn"> Бросить кубики</button>
- <div class="dice-result" id="diceResult"></div>
- </div>
- <div class="game-log" id="gameLog"></div>
- </div>
- </div>
- <script src="game.js?v=2"></script>
+  <main class="app-shell">
+    <div id="sceneRoot" class="scene-root"></div>
+
+    <section class="hud-panel stats-panel">
+      <div class="hud-label">Счёт</div>
+      <div class="hud-value"><span id="catsCount">0</span> котов взорвано</div>
+      <div class="hud-value"><span id="distanceCount">0</span> м пройдено</div>
+      <div class="hud-value">Прочность: <span id="healthCount">100</span>%</div>
+      <div class="hud-subtle">Рекорд: <span id="bestCount">0</span> м</div>
+    </section>
+
+    <section class="hud-panel ability-panel">
+      <div class="hud-label">Способности</div>
+      <div class="ability-row">
+        <span>Рыбка-обманка</span>
+        <span id="fishCooldown">Готова</span>
+      </div>
+      <div class="ability-row">
+        <span>Щит ПВО</span>
+        <span id="shieldCooldown">Готов</span>
+      </div>
+      <div class="ability-row">
+        <span>Щит активен</span>
+        <span id="shieldTimer">0.0 c</span>
+      </div>
+      <div class="ability-row">
+        <span>Высота</span>
+        <span id="altitudeState">Высоко</span>
+      </div>
+    </section>
+
+    <section class="hud-panel controls-panel">
+      <div class="hud-label">Управление</div>
+      <div class="control-line">`W` вверх, `S` вниз</div>
+      <div class="control-line">`A` влево, `D` вправо</div>
+      <div class="control-line">Клик мышью: лететь к точке</div>
+      <div class="control-line">`Space`: рыбка-обманка</div>
+      <div class="control-line">`Ctrl`: щит на 3 сек</div>
+      <div class="control-line">`Esc`: пауза</div>
+    </section>
+
+    <div id="messageBox" class="message-box"></div>
+
+    <section id="startOverlay" class="screen-overlay">
+      <div class="overlay-card">
+        <div class="overlay-kicker">3D Аркада</div>
+        <h1>Дрон, коты и станция ПВО</h1>
+        <p>Лети вперёд, уклоняйся от медленных пуль, не цепляй деревья и опускайся вниз только когда нужно разобраться с котами.</p>
+        <ul class="feature-list">
+          <li>ПВО стреляет каждые 5 секунд очередью из 4-7 пуль.</li>
+          <li>На низкой высоте снизу атакуют 1-3 кота.</li>
+          <li>Рыбка-обманка оглушает котов на 6 секунд.</li>
+          <li>Щит блокирует урон от ПВО на 3 секунды.</li>
+        </ul>
+        <div class="overlay-actions">
+          <button id="startGameBtn" class="action-btn primary-btn">Начать полёт</button>
+          <a class="action-btn ghost-btn" href="../index.html">Выйти</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="pauseOverlay" class="screen-overlay hidden">
+      <div class="overlay-card">
+        <div class="overlay-kicker">Пауза</div>
+        <h2>Полет приостановлен</h2>
+        <p>Можно вернуться в игру, начать заново или выйти.</p>
+        <div class="overlay-actions">
+          <button id="resumeGameBtn" class="action-btn primary-btn">Вернуться</button>
+          <button id="restartGameBtn" class="action-btn">Начать заново</button>
+          <a class="action-btn ghost-btn" href="../index.html">Выйти</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="gameOverOverlay" class="screen-overlay hidden">
+      <div class="overlay-card">
+        <div class="overlay-kicker">Поражение</div>
+        <h2>Дрон уничтожен</h2>
+        <p>Пройдено: <strong id="finalDistance">0</strong> м</p>
+        <p>Рекорд: <strong id="recordDistance">0</strong> м</p>
+        <p>Котов взорвано: <strong id="finalCats">0</strong></p>
+        <div class="overlay-actions">
+          <button id="retryGameBtn" class="action-btn primary-btn">Попробовать снова</button>
+          <a class="action-btn ghost-btn" href="../index.html">Выйти</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="game.js"></script>
 </body>
 </html>

@@ -1,1053 +1,935 @@
-const BOARD_SIZE = 40;
-const STARTING_MONEY = 1500;
-
-const boardCells = [
- { id: 0, name: "Старт", type: "go", description: "Получите котоплату 200 лапок, когда проходите это поле вперёд" },
- { id: 1, name: "Подвальный переулок", type: "property", color: "brown", price: 60, mortgage: 30, mortgageCost: 33, baseRent: 4, colorRent: 8, houses: [20, 60, 180, 320], hotel: 450, houseCost: 50 },
- { id: 2, name: "Фонд \"Сытая морда\"", type: "community", description: "Карточка фонда" },
- { id: 3, name: "Улица Мурлыкина", type: "property", color: "brown", price: 60, mortgage: 30, mortgageCost: 33, baseRent: 4, colorRent: 8, houses: [20, 60, 180, 320], hotel: 450, houseCost: 50 },
- { id: 4, name: "Усатый налог", type: "tax", amount: 200 },
- { id: 5, name: "Тыгыдыдская железная дорога", type: "railroad", price: 200, rents: [25, 50, 100, 200] },
- { id: 6, name: "Проспект Усатого-Полосатого", type: "property", color: "blue", price: 100, mortgage: 50, mortgageCost: 55, baseRent: 6, colorRent: 12, houses: [30, 90, 270, 400], hotel: 550, houseCost: 50 },
- { id: 7, name: "Девятая жизнь", type: "chance", description: "Карточка шанса" },
- { id: 8, name: "Улица Тёплой Лежанки", type: "property", color: "blue", price: 100, mortgage: 50, mortgageCost: 55, baseRent: 6, colorRent: 12, houses: [30, 90, 270, 400], hotel: 550, houseCost: 50 },
- { id: 9, name: "Валерьяновый бульвар", type: "property", color: "blue", price: 120, mortgage: 60, mortgageCost: 66, baseRent: 8, colorRent: 16, houses: [40, 100, 300, 450], hotel: 600, houseCost: 50 },
- { id: 10, name: "Переноска", type: "jail", description: "В переноске или просто посетил переноску" },
- { id: 11, name: "Когтеточкинская площадь", type: "property", color: "purple", price: 140, mortgage: 70, mortgageCost: 77, baseRent: 10, colorRent: 20, houses: [50, 150, 450, 625], hotel: 750, houseCost: 100 },
- { id: 12, name: "Обогревание лапок", type: "utility", price: 150 },
- { id: 13, name: "Набережная Рыбьего Хвоста", type: "property", color: "purple", price: 140, mortgage: 70, mortgageCost: 77, baseRent: 10, colorRent: 20, houses: [50, 150, 450, 625], hotel: 750, houseCost: 100 },
- { id: 14, name: "Мяу-стрит", type: "property", color: "purple", price: 160, mortgage: 80, mortgageCost: 88, baseRent: 12, colorRent: 24, houses: [60, 180, 500, 700], hotel: 900, houseCost: 100 },
- { id: 15, name: "Мурманский вокзал", type: "railroad", price: 200, rents: [25, 50, 100, 200] },
- { id: 16, name: "Лапки Аллея", type: "property", color: "orange", price: 180, mortgage: 90, mortgageCost: 99, baseRent: 14, colorRent: 28, houses: [70, 200, 550, 750], hotel: 950, houseCost: 100 },
- { id: 17, name: "Фонд \"Сытая морда\"", type: "community", description: "Карточка фонда" },
- { id: 18, name: "Засадная улица", type: "property", color: "orange", price: 180, mortgage: 90, mortgageCost: 99, baseRent: 14, colorRent: 28, houses: [70, 200, 550, 750], hotel: 950, houseCost: 100 },
- { id: 19, name: "Ночной Дозор проспект", type: "property", color: "orange", price: 200, mortgage: 100, mortgageCost: 110, baseRent: 16, colorRent: 32, houses: [80, 220, 600, 800], hotel: 1000, houseCost: 100 },
- { id: 20, name: "Бесплатная картонная коробка", type: "free_space", description: "Ничего не происходит" },
- { id: 21, name: "Леопардовый проспект", type: "property", color: "red", price: 220, mortgage: 110, mortgageCost: 121, baseRent: 18, colorRent: 36, houses: [90, 250, 700, 875], hotel: 1050, houseCost: 150 },
- { id: 22, name: "Девятая жизнь", type: "chance", description: "Карточка шанса" },
- { id: 23, name: "Пантерный тупик", type: "property", color: "red", price: 220, mortgage: 110, mortgageCost: 121, baseRent: 18, colorRent: 36, houses: [90, 250, 700, 875], hotel: 1050, houseCost: 150 },
- { id: 24, name: "Красная улица", type: "property", color: "red", price: 240, mortgage: 120, mortgageCost: 132, baseRent: 20, colorRent: 40, houses: [100, 300, 750, 925], hotel: 1100, houseCost: 150 },
- { id: 25, name: "Станция \"Кошачья Мята\"", type: "railroad", price: 200, rents: [25, 50, 100, 200] },
- { id: 26, name: "Солнечный подоконник", type: "property", color: "yellow", price: 260, mortgage: 130, mortgageCost: 143, baseRent: 22, colorRent: 44, houses: [110, 330, 800, 975], hotel: 1150, houseCost: 150 },
- { id: 27, name: "Мурр-Молл", type: "property", color: "yellow", price: 260, mortgage: 130, mortgageCost: 143, baseRent: 22, colorRent: 44, houses: [110, 330, 800, 975], hotel: 1150, houseCost: 150 },
- { id: 28, name: "Чистые Лапки", type: "utility", price: 150 },
- { id: 29, name: "Золотой клубок", type: "property", color: "yellow", price: 280, mortgage: 140, mortgageCost: 154, baseRent: 24, colorRent: 48, houses: [120, 360, 850, 1025], hotel: 1200, houseCost: 150 },
- { id: 30, name: "Отправляйся в переноску", type: "go_to_jail", description: "Игрок отправляется на клетку переноски и не получает 200 лапок за старт" }
-];
-
-const chanceCards = [
- { text: " «Тыгыдык в 3 ночи — соседи вызвали патруль» Идите в Переноску (10). Не получаете 200 лапок за проход.", action: "goToJail" },
- { text: " «Кот увязался за клубком до соседнего района» Пройдите на 3 клетки назад.", action: "moveRelative", steps: -3 },
- { text: " «Мяу-навигатор сбился — вы запрыгнули не в ту коробку» Вернитесь на клетку «Подвальный переулок».", action: "moveTo", position: 1 },
- { text: " «Срочная ветеринарка — везите кота на такси» Пройдите на ближайшую Железную дорогу. Если она не ваша — заплатите двойную ренту.", action: "moveToNearestRailroad", doubleRent: true },
- { text: " «Котозагранпоездка — вы забыли переноску» Пройдите на клетку «Старт» и получите 200 лапок.", action: "moveTo", position: 0 },
- { text: " «Ваш кот снялся в рекламе Вискас» Получите 150 лапок.", action: "receive", amount: 150 },
- { text: " «Улов дня: золотая рыбка в аквариуме» Получите 100 лапок.", action: "receive", amount: 100 },
- { text: " «Победили в конкурсе \"Кот месяца\"» Получите 120 лапок от банка.", action: "receive", amount: 120 },
- { text: " «Сдали 10 кг корма в приют — возврат от спонсора» Получите 80 лапок.", action: "receive", amount: 80 },
- { text: " «Нашли под диваном древний кошачий клад — игрушку и монеты» Получите 200 лапок.", action: "receive", amount: 200 },
- { text: " «Кот случайно подписал контракт на рекламу наполнителя» Получите 130 лапок.", action: "receive", amount: 130 },
- { text: " «День хвостатого рождения: конверт от бабушки» Получите 50 лапок от каждого игрока.", action: "collectFromEachPlayer", amount: 50 },
- { text: " «Проглотил игрушку — операция» Заплатите 150 лапок.", action: "pay", amount: 150, category: "medical" },
- { text: " «Аллергия на новый корм — лечение» Заплатите 100 лапок.", action: "pay", amount: 100, category: "medical" },
- { text: " «Разодрали офисный диван» Заплатите 60 лапок.", action: "pay", amount: 60, category: "fine" },
- { text: " «Вызов клининга от шерсти во всей квартире» Заплатите 40 лапок.", action: "pay", amount: 40, category: "fine" },
- { text: " «Кот перегрыз зарядку от MacBook» Заплатите 120 лапок.", action: "pay", amount: 120, category: "fine" },
- { text: " «Отравился валерьянкой — капельница» Заплатите 90 лапок.", action: "pay", amount: 90, category: "medical" },
- { text: " «Заказал 100 коробок, пока вас не было» Заплатите 70 лапок.", action: "pay", amount: 70, category: "fine" },
- { text: " «Штраф за ночной концерт» Заплатите 50 лапок.", action: "pay", amount: 50, category: "fine" },
- { text: " «Ваша кошка признана Мяу-королевой города» Каждый игрок дарит вам 25 лапок.", action: "collectFromEachPlayer", amount: 25 },
- { text: " «Благотворительная раздача игрушек приюту» Заплатите 30 лапок или скиньте карту \"Выйти из Переноски\", если есть.", action: "payOrUseSpecificCard", amount: 30, cardKey: "jailFree", cardLabel: "Выход из Переноски", category: "fine" },
- { text: " «Кот решил, что вы бедный, и принёс вам мышь» Получите 10 лапок (но стыдно).", action: "receive", amount: 10 },
-{ text: "«Чёрный кот пересёк путь — аура неудач» Следующий платёж (аренда/налог) увеличьте на 20%.", action: "setNextRentOrTaxMultiplier", multiplier: 1.2 },
- { text: " «Нашли 9-ю жизнь» Сохраните эту карту. Можно использовать как бесплатный выход из Переноски или продать.", action: "gainCard", cardKey: "nineLives", cardLabel: "9-я жизнь" },
- { text: " «Кот отжал у вас джойстик и выиграл в Котослотах» Получите 75 лапок.", action: "receive", amount: 75 },
- { text: " «Соседка попросила почесать за ушком — благодарность» Получите 60 лапок.", action: "receive", amount: 60 },
- { text: " «Вас назначили главным в фестивале кошачьих шляп» Пройдите на поле «Старт», получите 200 лапок.", action: "moveTo", position: 0 },
- { text: " «Отправляетесь в кошачий лагерь» Идите в Переноску. Без 200 лапок.", action: "goToJail" },
- { text: " «Сбор корма по району» Пройдите на ближайшую Железную дорогу, заплатите владельцу двойную ренту.", action: "moveToNearestRailroad", doubleRent: true },
- { text: " «Помогли потерявшемуся котёнку» Вернитесь на 5 клеток назад.", action: "moveRelative", steps: -5 },
- { text: " «Фонд \"Сытая Морда\": выплата за стерилизацию» Получите 75 лапок.", action: "receive", amount: 75 },
- { text: " «Ежегодная рыбная лотерея» Получите 90 лапок.", action: "receive", amount: 90 },
- { text: " «Ветпомощь спонсирует здоровый хвост» Получите 60 лапок.", action: "receive", amount: 60 },
- { text: " «Конкурс красоты среди трёхцветных» Получите 110 лапок.", action: "receive", amount: 110 },
- { text: " «Ваша кошка приютила котёнка — пособие» Получите 85 лапок.", action: "receive", amount: 85 },
- { text: " «Городской день чистки ковров» Заплатите 50 лапок.", action: "pay", amount: 50, category: "fine" },
- { text: " «Эпидемия блох — общественная обработка» Заплатите 45 лапок.", action: "pay", amount: 45, category: "medical" },
- { text: " «Строительство кошачьего парка» Заплатите 70 лапок.", action: "pay", amount: 70, category: "fine" },
- { text: " «Штраф за неправильный лоток в общественном месте» Заплатите 60 лапок.", action: "pay", amount: 60, category: "fine" },
- { text: " «Котопарад закрыл движение — возмещение» Заплатите 40 лапок.", action: "pay", amount: 40, category: "fine" },
- { text: " «Карта \"Сытая Морда\"» — оставьте. Можно в любой момент отменить одну оплату аренды.", action: "gainCard", cardKey: "rentCancel", cardLabel: "Карта \"Сытая Морда\"" },
- { text: " «Выход из Переноски» — карта освобождения.", action: "gainCard", cardKey: "jailFree", cardLabel: "Выход из Переноски" },
- { text: " «Ветеринарный взнос» — заплатите 50 лапок в банк или по 20 каждому игроку.", action: "vetContribution", bankAmount: 50, perPlayerAmount: 20 },
- { text: " «Кошачья солидарность» — получите 20 лапок от каждого игрока.", action: "collectFromEachPlayer", amount: 20 },
- { text: " «Кот выиграл гран-при на выставке породистых хвостов» Получите 200 лапок.", action: "receive", amount: 200 },
- { text: " «Пожертвование игрушек в приют от имени вашего кота» Заплатите 40 лапок в банк.", action: "pay", amount: 40, category: "fine" },
- { text: "«Срочный сбор средств на операцию бездомному коту» Заплатите 100 лапок или скиньте любую карту с руки (кроме освобождения).", action: "payOrDiscardAnyNonReleaseCard", amount: 100, category: "medical" },
- { text: " «Ваш кот получил открытку от тайного поклонника с купюрой» Получите 50 лапок.", action: "receive", amount: 50 },
- { text: " «Страховка \"Лапка-царапка\" возместила порчу мебели» Получите 65 лапок.", action: "receive", amount: 65 }
-];
-
-const communityCards = [
- { text: " «Вам вручили \"Премию усатых надежд\" и конверт» Получите 100 лапок.", action: "receive", amount: 100 },
- { text: " «Кот толкнул вазу с подоконника» Заплатите 35 лапок за ремонт.", action: "pay", amount: 35, category: "fine" },
- { text: " «Салон красоты для пушистых — скидка от совета города» Заплатите 30 лапок и получите карту \"Выход из Переноски\", если есть в банке.", action: "payAndGainCard", amount: 30, category: "fine", cardKey: "jailFree", cardLabel: "Выход из Переноски" },
- { text: " «Выиграли годовой запас тунца — продали излишки» Получите 120 лапок.", action: "receive", amount: 120 },
- { text: " «Ваш кот записал альбом с мурчанием — роялти» Получите 90 лапок.", action: "receive", amount: 90 },
- { text: " «Общественная чистка зубов котам — налог» Заплатите 25 лапок.", action: "pay", amount: 25, category: "tax" },
- { text: " «Кот сбежал в отпуск в коробке — вам компенсация от отеля» Получите 70 лапок.", action: "receive", amount: 70 },
- { text: " «Штраф за незаконный выгул без поводка» Заплатите 55 лапок.", action: "pay", amount: 55, category: "fine" },
- { text: " «Кот сломал лежанку в гостях — извинительный взнос» Заплатите 45 лапок.", action: "pay", amount: 45, category: "fine" },
- { text: " «День кошачьего непослушания — беспорядки» Заплатите 30 лапок в общественный фонд или потеряйте следующую аренду.", action: "payOrLoseNextRent", amount: 30 },
- { text: " «Открыли котобанковский счёт с бонусом» Получите 95 лапок.", action: "receive", amount: 95 },
- { text: " «Кот нашёл на улице плюшевую мышь и чек» Получите 35 лапок.", action: "receive", amount: 35 },
- { text: " «Вашу кошку выбрали лицом обложки журнала \"Мурзилка\"» Получите 150 лапок.", action: "receive", amount: 150 },
- { text: " «Бесплатная вакцинация от города — сэкономлено» Получите 55 лапок из банка.", action: "receive", amount: 55 },
- { text: " «Штраф за громкий тыгыдык после 22:00» Заплатите 50 лапок.", action: "pay", amount: 50, category: "fine" },
- { text: " «Кот выпил вашу валерьянку — вызвали скорую» Заплатите 75 лапок.", action: "pay", amount: 75, category: "medical" },
- { text: " «Выигрыш в кото-лотерее \"Лапки-царапки\"» Получите 130 лапок.", action: "receive", amount: 130 },
- { text: " «Специальный билет на поезд для кота — возмещение проезда» Получите 40 лапок.", action: "receive", amount: 40 },
- { text: " «Ваш кот нарыбачил в фонтане у мэрии» Штраф 65 лапок.", action: "pay", amount: 65, category: "fine" },
- { text: " «Подарок от города за лучший кошачий сад» Получите 75 лапок.", action: "receive", amount: 75 },
- { text: " «Налог на усы свыше 10 см» Заплатите 30 лапок.", action: "pay", amount: 30, category: "tax" },
- { text: " «Карнавал кошачьих масок — вы выиграли приз» Получите 85 лапок.", action: "receive", amount: 85 },
- { text: " «Субботник по вычёсыванию шерсти — вам компенсация» Получите 45 лапок.", action: "receive", amount: 45 },
- { text: " «Поздравление от кошачьего мэра с конвертом» Получите 70 лапок.", action: "receive", amount: 70 },
- { text: " «Внеплановая проверка лотка — штраф за несоответствие» Заплатите 40 лапок.", action: "pay", amount: 40, category: "fine" },
- { text: " «Кассовый чек от кота: 20 мышей и банка тунца» Заплатите 25 лапок.", action: "pay", amount: 25, category: "fine" },
- { text: "«Кот украл носок и выменял на монетку» Получите 20 лапок.", action: "receive", amount: 20 },
- { text: " «Звание \"Почётный мышелов района\"» Получите 80 лапок.", action: "receive", amount: 80 },
- { text: " «Приют для пожилых котов получил грант — ваша доля» Получите 55 лапок.", action: "receive", amount: 55 },
- { text: " «Чрезвычайный сбор на ремонт кошачьей площадки» Заплатите 45 лапок.", action: "pay", amount: 45, category: "fine" },
- { text: " «Выдача \"Талон Кото-Доктор\"» Сохраните карту. Можно использовать для отмены одного медицинского штрафа.", action: "gainCard", cardKey: "medicalPass", cardLabel: "Талон Кото-Доктор" },
- { text: " «Ваш кот стащил игрушку у соседа — штраф» Заплатите 20 лапок.", action: "pay", amount: 20, category: "fine" },
- { text: " «Фонд \"Пушистые лапы\" выплатил вам компенсацию за корм» Получите 65 лапок.", action: "receive", amount: 65 },
- { text: " «Патруль усов задержал за незаконное мяуканье» Заплатите 55 лапок.", action: "pay", amount: 55, category: "fine" },
- { text: " «Спонсор подарил годовой запас кошачьей мяты» Получите 95 лапок (продали).", action: "receive", amount: 95 },
- { text: " «Кот испортил важный документ — платите нотариусу» Заплатите 70 лапок.", action: "pay", amount: 70, category: "fine" },
- { text: " «Посылка с игрушками — возврат средств за брак» Получите 30 лапок.", action: "receive", amount: 30 },
- { text: " «Совет котов одобрил вам рыбную субсидию» Получите 80 лапок.", action: "receive", amount: 80 },
- { text: " «День подарков в Мяу-нополии» Каждый игрок дарит вам 15 лапок.", action: "collectFromEachPlayer", amount: 15 },
- { text: " «Кот сдал назад налоговую декларацию — возмещение» Получите 70 лапок.", action: "receive", amount: 70 },
- { text: " «Оплата уборки городской когтеточки» Заплатите 25 лапок.", action: "pay", amount: 25, category: "fine" },
- { text: " «Ваша лежанка признана лучшей — премия банка» Получите 60 лапок.", action: "receive", amount: 60 },
- { text: "«Тайный Санта среди котов — вы получили купюру» Получите 50 лапок.", action: "receive", amount: 50 },
- { text: " «Пени за просрочку оплаты наполнителя» Заплатите 35 лапок.", action: "pay", amount: 35, category: "fine" },
- { text: " «Спонтанный кошачий флешмоб — компенсация за шум» Заплатите 20 лапок.", action: "pay", amount: 20, category: "fine" },
- { text: " «Ваш кот — лицо бренда \"Мяу-кола\"» Получите 140 лапок.", action: "receive", amount: 140 },
- { text: " «Игрушка-мышь вызвала ажиотаж — выигрыш от продажи» Получите 100 лапок.", action: "receive", amount: 100 },
- { text: " «Кот сбил горшок с цветком — нервы соседа» Заплатите 50 лапок.", action: "pay", amount: 50, category: "fine" },
- { text: " «Всемирный день кота — универсальная выплата» Все игроки получают по 50 лапок.", action: "allPlayersReceive", amount: 50 },
- { text: " «Билет \"Второй шанс\"» — можно один раз перебросить кубики при попадании на чужую улицу.", action: "gainCard", cardKey: "secondChance", cardLabel: "Билет \"Второй шанс\"" },
- { text: " «Карта \"Мяу-прощение\"» — аннулирует один любой штраф или налог.", action: "gainCard", cardKey: "forgiveness", cardLabel: "Карта \"Мяу-прощение\"" }
-];
-
-class Player {
- constructor(id, name, color, startPosition = 0) {
- this.id = id;
- this.name = name;
- this.color = color;
- this.position = startPosition;
- this.money = STARTING_MONEY;
- this.properties = [];
- this.inJail = false;
- this.jailTurns = 0;
- this.doubleCount = 0;
- this.cards = {
- jailFree: 0,
- nineLives: 0,
- rentCancel: 0,
- medicalPass: 0,
- secondChance: 0,
- forgiveness: 0
- };
- this.statusEffects = {
- nextRentOrTaxMultiplier: 1,
- skipNextRentPayment: false
- };
- }
-
- move(spaces) {
- const nextPosition = this.position + spaces;
- const passedStart = nextPosition >= BOARD_SIZE;
- this.position = nextPosition % BOARD_SIZE;
- return passedStart;
- }
-
- addProperty(cellId) {
- this.properties.push(cellId);
- }
-
- pay(amount) {
- this.money -= amount;
- return this.money >= 0;
- }
-
- receive(amount) {
- this.money += amount;
- }
-
- goToJail() {
- this.position = 10;
- this.inJail = true;
- this.jailTurns = 0;
- }
-}
-
-class MonopolyGame {
- constructor() {
- this.players = [
- new Player(0, "Игрок 1", "#ef4444"),
- new Player(1, "Игрок 2", "#3b82f6")
- ];
- this.currentPlayerIndex = 0;
- this.gameBoard = document.getElementById("gameBoard");
- this.playerInfo = document.getElementById("playerInfo");
- this.diceResult = document.getElementById("diceResult");
- this.gameLog = document.getElementById("gameLog");
- this.rollDiceBtn = document.getElementById("rollDice");
- this.chanceDeck = this.shuffleDeck(chanceCards);
- this.communityDeck = this.shuffleDeck(communityCards);
-
- this.initBoard();
- this.initPlayers();
- this.updateUI();
- this.addLog(" Игра началась! Первым ходит " + this.getCurrentPlayer().name);
-
- this.rollDiceBtn.addEventListener("click", () => this.rollDice());
- }
-
- getCurrentPlayer() {
- return this.players[this.currentPlayerIndex];
- }
-
- shuffleDeck(cards) {
- const deck = [...cards];
- for (let i = deck.length - 1; i > 0; i--) {
- const j = Math.floor(Math.random() * (i + 1));
- [deck[i], deck[j]] = [deck[j], deck[i]];
- }
- return deck;
- }
-
- drawDeckCard(type) {
- const deckName = type === "chance" ? "chanceDeck" : "communityDeck";
-
- if (this[deckName].length === 0) {
- this[deckName] = this.shuffleDeck(type === "chance" ? chanceCards : communityCards);
- }
-
- const card = this[deckName].shift();
- this[deckName].push(card);
- return card;
- }
-
- awardStartMoney(player) {
- player.receive(200);
- this.addLog(` ${player.name} получает котоплату 200 лапок!`);
- }
-
- initBoard() {
- this.gameBoard.innerHTML = "";
- const gridSize = 11;
- 
- for (let row = 0; row < gridSize; row++) {
- for (let col = 0; col < gridSize; col++) {
- const cell = document.createElement("div");
- cell.className = "cell";
- 
- const cellIndex = this.getCellIndex(row, col);
- 
- if (cellIndex !== null && boardCells[cellIndex]) {
- const cellData = boardCells[cellIndex];
- cell.dataset.id = cellIndex;
- 
- if (cellData.color) {
- cell.classList.add(cellData.color);
- }
-
- if (cellData.type === "go") cell.classList.add("go");
- else if (cellData.type === "jail") cell.classList.add("jail");
- else if (cellData.type === "go_to_jail") cell.classList.add("go_to_jail");
- else if (cellData.type === "tax") cell.classList.add("special");
- else if (cellData.type === "chance" || cellData.type === "community") cell.classList.add("special");
- else if (cellData.type === "free_space") cell.classList.add("free_space");
- else if (cellData.type === "parking") cell.classList.add("parking");
-
- const name = document.createElement("div");
- name.className = "cell-name";
- name.textContent = cellData.name;
- cell.appendChild(name);
-
- if (cellData.price) {
- const price = document.createElement("div");
- price.className = "cell-price";
- price.textContent = `${cellData.price} лапок`;
- cell.appendChild(price);
- }
- } else {
- cell.style.background = "rgba(255, 255, 255, 0.05)";
- }
-
- this.gameBoard.appendChild(cell);
- }
- }
- }
-
- getCellIndex(row, col) {
- const gridSize = 11;
- const sideLength = 10;
- 
- if (row === 0 && col === 0) {
- return 10;
- } else if (row === 0 && col === gridSize - 1) {
- return 30;
- } else if (row === gridSize - 1 && col === 0) {
- return 0;
- } else if (row === gridSize - 1) {
- return col;
- } else if (col === gridSize - 1) {
- return sideLength + (gridSize - 1 - row);
- } else if (row === 0) {
- return 2 * sideLength + (gridSize - 1 - col);
- } else if (col === 0) {
- return 3 * sideLength + (gridSize - 1 - row);
- }
- 
- return null;
- }
-
- initPlayers() {
- this.players.forEach((player, index) => {
- const token = document.createElement("div");
- token.className = "player-token";
- token.style.backgroundColor = player.color;
- token.id = `token-${player.id}`;
- 
- const startPos = this.getGridPosition(0);
- const gridSize = 11;
- const cellIndexInDOM = startPos.row * gridSize + startPos.col;
- 
- this.gameBoard.children[cellIndexInDOM].appendChild(token);
- });
- }
-
- rollDice() {
- const player = this.getCurrentPlayer();
-
- if (player.inJail && this.tryUseJailFreeCard(player)) {
- this.updateUI();
- }
-
- if (player.inJail) {
- this.handleJailTurn(player);
- return;
- }
-
- this.rollDiceBtn.disabled = true;
- 
- let dice1, dice2;
- let doubles = 0;
- let totalRoll = 0;
-
- do {
- dice1 = Math.floor(Math.random() * 6) + 1;
- dice2 = Math.floor(Math.random() * 6) + 1;
- const isDouble = dice1 === dice2;
- 
- if (isDouble) {
- doubles++;
- player.doubleCount++;
- this.addLog(` ${player.name} выбросил дубль: ${dice1}+${dice2}=${dice1+dice2}`);
- 
- if (doubles === 3) {
- this.addLog(` ${player.name} выбросил 3 дубля подряд! Идёт в переноску!`);
- player.goToJail();
- this.movePlayerToken(player, 10);
- this.nextTurn();
- return;
- }
- } else {
- this.addLog(` ${player.name} выбросил: ${dice1}+${dice2}=${dice1+dice2}`);
- }
- 
- totalRoll += dice1 + dice2;
- 
- if (!isDouble || doubles === 0) {
- break;
- }
- } while (true);
-
- const passedStart = player.move(totalRoll);
- this.movePlayerToken(player, player.position);
-
- if (passedStart) {
- this.awardStartMoney(player);
- }
- 
- this.checkCell(player);
-
- if (player.inJail) {
- player.doubleCount = 0;
- this.nextTurn();
- } else if (dice1 !== dice2) {
- player.doubleCount = 0;
- this.nextTurn();
- } else {
- this.rollDiceBtn.disabled = false;
- this.addLog(` ${player.name} выбросил дубль! Ходит ещё раз!`);
- }
- }
-
- handleJailTurn(player) {
- player.jailTurns++;
- 
- const dice1 = Math.floor(Math.random() * 6) + 1;
- const dice2 = Math.floor(Math.random() * 6) + 1;
- 
- this.addLog(` ${player.name} в переноске выбросил: ${dice1}+${dice2}=${dice1+dice2}`);
- 
- if (dice1 === dice2) {
- player.inJail = false;
- player.jailTurns = 0;
- player.pay(50);
- this.addLog(`🆓 ${player.name} выходит из переноски по дублю и платит 50 лапок`);
- 
- const passedStart = player.move(dice1 + dice2);
- this.movePlayerToken(player, player.position);
-
- if (passedStart) {
- this.awardStartMoney(player);
- }
-
- this.checkCell(player);
- 
- this.nextTurn();
- } else if (player.jailTurns >= 3) {
- player.inJail = false;
- player.jailTurns = 0;
- this.addLog(` ${player.name} отсидел 3 хода в переноске и выйдет на следующий ход`);
- this.nextTurn();
- } else {
- this.addLog(`⏳ ${player.name} остаётся в переноске (${player.jailTurns}/3)`);
- this.nextTurn();
- }
- }
-
- movePlayerToken(player, newPosition) {
- const token = document.getElementById(`token-${player.id}`);
- const gridSize = 11;
- 
- const cellIndex = this.getGridPosition(newPosition);
- const cellIndexInDOM = cellIndex.row * gridSize + cellIndex.col;
- 
- const cell = this.gameBoard.children[cellIndexInDOM];
- cell.appendChild(token);
- }
-
- getGridPosition(cellIndex) {
- const gridSize = 11;
- const sideLength = 10;
- 
- if (cellIndex === 10) {
- return { row: 0, col: 0 };
- } else if (cellIndex === 30) {
- return { row: 0, col: gridSize - 1 };
- } else if (cellIndex === 0) {
- return { row: gridSize - 1, col: 0 };
- } else if (cellIndex < 10) {
- return { row: gridSize - 1, col: cellIndex };
- } else if (cellIndex < 20) {
- return { row: gridSize - 1 - (cellIndex - 10), col: gridSize - 1 };
- } else if (cellIndex < 30) {
- return { row: 0, col: gridSize - 1 - (cellIndex - 20) };
- } else if (cellIndex < 40) {
- return { row: gridSize - 1 - (cellIndex - 30), col: 0 };
- }
- 
- return { row: gridSize - 1, col: 0 };
- }
-
- getOtherPlayers(player) {
- return this.players.filter(otherPlayer => otherPlayer.id !== player.id);
- }
-
- movePlayerBy(player, steps, checkCellAfterMove = true) {
- const passedStart = steps > 0 && player.position + steps >= BOARD_SIZE;
- const nextPosition = ((player.position + steps) % BOARD_SIZE + BOARD_SIZE) % BOARD_SIZE;
- player.position = nextPosition;
- this.movePlayerToken(player, nextPosition);
-
- if (passedStart) {
- this.awardStartMoney(player);
- }
-
- if (checkCellAfterMove) {
- this.checkCell(player);
- }
- }
-
- movePlayerTo(player, targetPosition, checkCellAfterMove = true) {
- const passedStart = targetPosition < player.position;
- player.position = targetPosition;
- this.movePlayerToken(player, targetPosition);
-
- if (passedStart && targetPosition === 0) {
- this.awardStartMoney(player);
- }
-
- if (checkCellAfterMove) {
- this.checkCell(player);
- }
- }
-
- getCardInventory(player) {
- const labels = {
- jailFree: "Выход из Переноски",
- nineLives: "9-я жизнь",
- rentCancel: "Карта \"Сытая Морда\"",
- medicalPass: "Талон Кото-Доктор",
- secondChance: "Билет \"Второй шанс\"",
- forgiveness: "Карта \"Мяу-прощение\""
- };
-
- return Object.entries(player.cards)
- .filter(([, count]) => count > 0)
- .map(([key, count]) => `${labels[key]} x${count}`);
- }
-
- addCardToPlayer(player, cardKey, cardLabel) {
- player.cards[cardKey] = (player.cards[cardKey] || 0) + 1;
- this.addLog(`🃏 ${player.name} получает карту "${cardLabel}"`);
- }
-
- usePlayerCard(player, cardKey, cardLabel) {
- if (!player.cards[cardKey]) {
- return false;
- }
-
- player.cards[cardKey]--;
- this.addLog(`🃏 ${player.name} использует карту "${cardLabel}"`);
- return true;
- }
-
- tryUseJailFreeCard(player) {
- if (player.cards.jailFree > 0) {
- this.usePlayerCard(player, "jailFree", "Выход из Переноски");
- } else if (player.cards.nineLives > 0) {
- this.usePlayerCard(player, "nineLives", "9-я жизнь");
- } else {
- return false;
- }
-
- player.inJail = false;
- player.jailTurns = 0;
- this.addLog(`🆓 ${player.name} выходит из переноски по карте и продолжает ход`);
- return true;
- }
-
- applyPaymentModifiers(player, amount, category) {
- let finalAmount = amount;
-
- if (category === "rent" && player.statusEffects.skipNextRentPayment) {
- player.statusEffects.skipNextRentPayment = false;
- this.addLog(` ${player.name} пропускает следующую оплату аренды`);
- return 0;
- }
-
- if (category === "rent" && player.cards.rentCancel > 0) {
- this.usePlayerCard(player, "rentCancel", "Карта \"Сытая Морда\"");
- this.addLog(` Аренда для ${player.name} отменена`);
- return 0;
- }
-
- if (category === "medical" && player.cards.medicalPass > 0) {
- this.usePlayerCard(player, "medicalPass", "Талон Кото-Доктор");
- this.addLog(` Медицинский штраф для ${player.name} отменён`);
- return 0;
- }
-
- if ((category === "fine" || category === "tax") && player.cards.forgiveness > 0) {
- this.usePlayerCard(player, "forgiveness", "Карта \"Мяу-прощение\"");
- this.addLog(` Штраф или налог для ${player.name} аннулирован`);
- return 0;
- }
-
- if ((category === "rent" || category === "tax") && player.statusEffects.nextRentOrTaxMultiplier > 1) {
- finalAmount = Math.ceil(finalAmount * player.statusEffects.nextRentOrTaxMultiplier);
- player.statusEffects.nextRentOrTaxMultiplier = 1;
-this.addLog(`Следующий платёж ${player.name} увеличен на 20%: ${finalAmount} лапок`);
- }
-
- return finalAmount;
- }
-
- chargePlayer(player, amount, category = "generic", recipient = null) {
- const finalAmount = this.applyPaymentModifiers(player, amount, category);
-
- if (finalAmount <= 0) {
- return 0;
- }
-
- player.pay(finalAmount);
-
- if (recipient) {
- recipient.receive(finalAmount);
- }
-
- return finalAmount;
- }
-
- collectFromEachPlayer(player, amount) {
- let totalCollected = 0;
-
- for (const otherPlayer of this.getOtherPlayers(player)) {
- otherPlayer.pay(amount);
- player.receive(amount);
- totalCollected += amount;
- }
-
- this.addLog(` ${player.name} получает ${totalCollected} лапок от других игроков`);
- }
-
- payEachPlayer(player, amount) {
- let totalPaid = 0;
-
- for (const otherPlayer of this.getOtherPlayers(player)) {
- player.pay(amount);
- otherPlayer.receive(amount);
- totalPaid += amount;
- }
-
- return totalPaid;
- }
-
- payBankOrLoseNextRent(player, amount) {
- if (player.money >= amount) {
- const paid = this.chargePlayer(player, amount);
- this.addLog(` ${player.name} платит ${paid} лапок в общественный фонд`);
- return;
- }
-
- player.statusEffects.skipNextRentPayment = true;
- this.addLog(` ${player.name} теряет следующую оплату аренды вместо платежа в фонд`);
- }
-
- payVetContribution(player, bankAmount, perPlayerAmount) {
- const totalToPlayers = perPlayerAmount * this.getOtherPlayers(player).length;
-
- if (totalToPlayers > 0 && totalToPlayers < bankAmount) {
- const paid = this.payEachPlayer(player, perPlayerAmount);
- this.addLog(` ${player.name} платит ${paid} лапок другим игрокам по ветеринарному взносу`);
- return;
- }
-
- const paid = this.chargePlayer(player, bankAmount, "medical");
- this.addLog(` ${player.name} платит ${paid} лапок в банк по ветеринарному взносу`);
- }
-
- discardAnyNonReleaseCard(player) {
- const discardableCards = [
- ["rentCancel", "Карта \"Сытая Морда\""],
- ["medicalPass", "Талон Кото-Доктор"],
- ["secondChance", "Билет \"Второй шанс\""],
- ["forgiveness", "Карта \"Мяу-прощение\""]
- ];
-
- for (const [cardKey, cardLabel] of discardableCards) {
- if (player.cards[cardKey] > 0) {
- this.usePlayerCard(player, cardKey, cardLabel);
- this.addLog(` ${player.name} сбрасывает карту "${cardLabel}" вместо платежа`);
- return true;
- }
- }
-
- return false;
- }
-
- rerollFromSecondChance(player) {
- const dice1 = Math.floor(Math.random() * 6) + 1;
- const dice2 = Math.floor(Math.random() * 6) + 1;
- const total = dice1 + dice2;
- const passedStart = player.move(total);
-
- this.addLog(` ${player.name} перебрасывает кубики: ${dice1}+${dice2}=${total}`);
- this.movePlayerToken(player, player.position);
-
- if (passedStart) {
- this.awardStartMoney(player);
- }
-
- this.checkCell(player);
- }
-
- getNextRailroadPosition(position) {
- const railroadPositions = boardCells
- .filter(cell => cell.type === "railroad")
- .map(cell => cell.id)
- .sort((a, b) => a - b);
-
- for (const railroadPosition of railroadPositions) {
- if (railroadPosition > position) {
- return railroadPosition;
- }
- }
-
- return railroadPositions[0] ?? 0;
- }
-
- moveToNearestRailroadFromCard(player, doubleRent = false) {
- const destination = this.getNextRailroadPosition(player.position);
- const passedStart = destination < player.position;
-
- player.position = destination;
- this.movePlayerToken(player, destination);
- this.addLog(` ${player.name} перемещается на ближайшую железную дорогу`);
-
- if (passedStart) {
- this.awardStartMoney(player);
- }
-
- const cell = boardCells[destination];
- const owner = this.findPropertyOwner(cell.id);
-
- if (owner === null) {
- if (player.money >= cell.price) {
- player.addProperty(cell.id);
- player.pay(cell.price);
- this.addLog(` ${player.name} купил "${cell.name}" за ${cell.price} лапок`);
- } else {
- this.addLog(` ${player.name} не хватает лапок для покупки "${cell.name}"`);
- }
- return;
- }
-
- if (owner.id === player.id) {
- this.addLog(` ${player.name} уже владеет "${cell.name}"`);
- return;
- }
-
- const railroadCount = this.getRailroadCount(owner);
- const baseRent = cell.rents[Math.min(railroadCount - 1, 3)];
- const rent = doubleRent ? baseRent * 2 : baseRent;
- const paid = this.chargePlayer(player, rent, "rent", owner);
- this.addLog(` ${player.name} платит ${paid} лапок ренты за "${cell.name}"`);
- }
-
- resolveCardDraw(player, type) {
- const card = this.drawDeckCard(type);
- this.addLog(` ${player.name} тянет карточку: ${card.text}`);
- this.applyCardEffect(player, card);
- }
-
- applyCardEffect(player, card) {
- switch (card.action) {
- case "receive":
- player.receive(card.amount);
- this.addLog(` ${player.name} получает ${card.amount} лапок`);
- break;
-
- case "pay": {
- const paid = this.chargePlayer(player, card.amount, card.category);
- this.addLog(` ${player.name} платит ${paid} лапок`);
- break;
- }
-
- case "collectFromEachPlayer":
- this.collectFromEachPlayer(player, card.amount);
- break;
-
- case "allPlayersReceive":
- this.players.forEach(gamePlayer => gamePlayer.receive(card.amount));
- this.addLog(` Все игроки получают по ${card.amount} лапок`);
- break;
-
- case "moveRelative":
- this.movePlayerBy(player, card.steps);
- break;
-
- case "moveTo":
- this.movePlayerTo(player, card.position);
- break;
-
- case "goToJail":
- player.goToJail();
- this.movePlayerToken(player, 10);
- this.addLog(` ${player.name} отправляется в переноску по карточке`);
- break;
-
- case "moveToNearestRailroad":
- this.moveToNearestRailroadFromCard(player, card.doubleRent);
- break;
-
- case "gainCard":
- this.addCardToPlayer(player, card.cardKey, card.cardLabel);
- break;
-
- case "payAndGainCard": {
- const paid = this.chargePlayer(player, card.amount, card.category);
- this.addLog(` ${player.name} платит ${paid} лапок`);
- this.addCardToPlayer(player, card.cardKey, card.cardLabel);
- break;
- }
-
- case "payOrUseSpecificCard":
- if (!this.usePlayerCard(player, card.cardKey, card.cardLabel)) {
- const paid = this.chargePlayer(player, card.amount, card.category);
- this.addLog(` ${player.name} платит ${paid} лапок`);
- }
- break;
-
- case "setNextRentOrTaxMultiplier":
- player.statusEffects.nextRentOrTaxMultiplier = card.multiplier;
- this.addLog(`Следующая аренда или налог для ${player.name} увеличатся на 20%`);
- break;
-
- case "payOrLoseNextRent":
- this.payBankOrLoseNextRent(player, card.amount);
- break;
-
- case "vetContribution":
- this.payVetContribution(player, card.bankAmount, card.perPlayerAmount);
- break;
-
- case "payOrDiscardAnyNonReleaseCard":
- if (!this.discardAnyNonReleaseCard(player)) {
- const paid = this.chargePlayer(player, card.amount, card.category);
- this.addLog(` ${player.name} платит ${paid} лапок`);
- }
- break;
- }
- }
-
- checkCell(player) {
- const cell = boardCells[player.position];
- 
- if (!cell) return;
-
- this.addLog(` ${player.name} попал на "${cell.name}"`);
-
- switch (cell.type) {
- case "go":
- if (player.position === 0) {
- this.addLog(` ${player.name} находится на старте`);
- }
- break;
- 
- case "tax":
- this.addLog(` ${player.name} платит усатый налог ${this.chargePlayer(player, cell.amount, "tax")} лапок`);
- break;
- 
- case "property":
- this.handleProperty(player, cell);
- break;
- 
- case "jail":
- this.addLog(` ${player.name} просто посетил переноску`);
- break;
- 
- case "go_to_jail":
- this.addLog(` ${player.name} отправляется в переноску!`);
- player.goToJail();
- this.movePlayerToken(player, 10);
- this.addLog(` ${player.name} не получает 200 лапок за проход через старт`);
- break;
- 
- case "parking":
- this.addLog(`🅿 ${player.name} отдыхает на бесплатной парковке`);
- break;
- 
- case "free_space":
- this.addLog(` ${player.name} отдыхает в бесплатной картонной коробке`);
- break;
- 
- case "chance":
- this.resolveCardDraw(player, "chance");
- break;
-
- case "community":
- this.resolveCardDraw(player, "community");
- break;
- 
- case "utility":
- this.handleUtility(player, cell);
- break;
- 
- case "railroad":
- this.handleRailroad(player, cell);
- break;
- }
-
- this.updateUI();
- }
-
- handleProperty(player, cell) {
- const owner = this.findPropertyOwner(cell.id);
- 
- if (owner === null) {
- if (player.money >= cell.price) {
- player.addProperty(cell.id);
- player.pay(cell.price);
- this.addLog(` ${player.name} купил "${cell.name}" за ${cell.price} лапок`);
- } else {
- this.addLog(` ${player.name} не хватает лапок для покупки "${cell.name}"`);
- }
- } else if (owner.id !== player.id) {
- if (player.cards.secondChance > 0) {
- this.usePlayerCard(player, "secondChance", "Билет \"Второй шанс\"");
- this.rerollFromSecondChance(player);
- return;
- }
-
- const rent = this.calculateRent(cell, owner);
- const paid = this.chargePlayer(player, rent, "rent", owner);
- this.addLog(` ${player.name} платит ${paid} лапок ренты ${owner.name}`);
- } else {
- this.addLog(` ${player.name} владеет "${cell.name}"`);
- }
- }
-
- findPropertyOwner(cellId) {
- for (const player of this.players) {
- if (player.properties.includes(cellId)) {
- return player;
- }
- }
- return null;
- }
-
- calculateRent(cell, owner) {
- const ownerProperties = this.getColorGroupProperties(owner, cell.color);
- const allPropertiesInGroup = boardCells.filter(c => c.color === cell.color);
- 
- if (ownerProperties.length === allPropertiesInGroup.length) {
- return cell.colorRent;
- }
- 
- return cell.baseRent;
- }
-
- getColorGroupProperties(player, color) {
- return player.properties.filter(id => {
- const cell = boardCells[id];
- return cell && cell.color === color;
- });
- }
-
- handleUtility(player, cell) {
- const owner = this.findPropertyOwner(cell.id);
- 
- if (owner === null) {
- if (player.money >= cell.price) {
- player.addProperty(cell.id);
- player.pay(cell.price);
- this.addLog(` ${player.name} купил "${cell.name}" за ${cell.price} лапок`);
- } else {
- this.addLog(` ${player.name} не хватает лапок для покупки "${cell.name}"`);
- }
- } else if (owner.id !== player.id) {
- const utilityCount = this.getUtilityCount(owner);
- let multiplier = utilityCount === 2 ? 10 : 4;
- 
- let totalRoll = 0;
- let rolls = 0;
- let isDouble = false;
- 
- do {
- const dice1 = Math.floor(Math.random() * 6) + 1;
- const dice2 = Math.floor(Math.random() * 6) + 1;
- const rollSum = dice1 + dice2;
- totalRoll += rollSum;
- rolls++;
- isDouble = dice1 === dice2;
- 
- this.addLog(` ${player.name} бросил: ${dice1}+${dice2}=${rollSum}`);
- 
- if (!isDouble || rolls >= 3) {
- break;
- }
- } while (true);
- 
- const rent = totalRoll * multiplier;
- const paid = this.chargePlayer(player, rent, "rent", owner);
- this.addLog(` ${player.name} платит ${paid} лапок за "${cell.name}" (умножение на ${multiplier})`);
- } else {
- this.addLog(` ${player.name} владеет "${cell.name}"`);
- }
- }
-
- getUtilityCount(player) {
- return player.properties.filter(id => {
- const cell = boardCells[id];
- return cell && cell.type === "utility";
- }).length;
- }
-
- handleRailroad(player, cell) {
- const owner = this.findPropertyOwner(cell.id);
- 
- if (owner === null) {
- if (player.money >= cell.price) {
- player.addProperty(cell.id);
- player.pay(cell.price);
- this.addLog(` ${player.name} купил "${cell.name}" за ${cell.price} лапок`);
- } else {
- this.addLog(` ${player.name} не хватает лапок для покупки "${cell.name}"`);
- }
- } else if (owner.id !== player.id) {
- const railroadCount = this.getRailroadCount(owner);
- const rent = cell.rents[Math.min(railroadCount - 1, 3)];
-
- const paid = this.chargePlayer(player, rent, "rent", owner);
- this.addLog(` ${player.name} платит ${paid} лапок ренты за "${cell.name}" (${railroadCount} дорог у владельца)`);
- } else {
- this.addLog(` ${player.name} владеет "${cell.name}"`);
- }
- }
-
- getRailroadCount(player) {
- return player.properties.filter(id => {
- const cell = boardCells[id];
- return cell && cell.type === "railroad";
- }).length;
- }
-
- nextTurn() {
- this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
- this.updateUI();
- this.rollDiceBtn.disabled = false;
- }
-
- updateUI() {
- const player = this.getCurrentPlayer();
- const playerCards = this.getCardInventory(player);
- 
- this.playerInfo.innerHTML = `
- <h2> ${player.name}</h2>
- <div class="player-money"> ${player.money} лапок</div>
- <div class="player-properties">
- <strong>Собственность (${player.properties.length}):</strong>
- ${player.properties.map(id => {
- const cell = boardCells[id];
- return cell ? `<div>${cell.name}</div>` : '';
- }).join('')}
- </div>
- <div class="player-properties">
- <strong>Карты (${playerCards.length}):</strong>
- ${playerCards.length ? playerCards.map(card => `<div>${card}</div>`).join('') : '<div>Нет карт</div>'}
- </div>
- `;
- }
-
- addLog(message) {
- const entry = document.createElement("div");
- entry.className = "log-entry";
- entry.textContent = message;
- this.gameLog.appendChild(entry);
- this.gameLog.scrollTop = this.gameLog.scrollHeight;
- }
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js";
+
+const STORAGE_KEY = "artikotus-drone-record";
+const FORWARD_SPEED = 24;
+const SIDE_SPEED = 18;
+const VERTICAL_SPEED = 16;
+const MAX_SIDE = 23;
+const MIN_ALTITUDE = 2.4;
+const MAX_ALTITUDE = 24;
+const LOW_ALTITUDE_LIMIT = 6.4;
+const TREE_SPAWN_AHEAD = 420;
+const CAT_SPAWN_AHEAD = 400;
+
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+const lerp = (start, end, alpha) => start + (end - start) * alpha;
+const randRange = (min, max) => min + Math.random() * (max - min);
+const randInt = (min, max) => Math.floor(randRange(min, max + 1));
+
+class DroneCatsGame {
+  constructor() {
+    this.sceneRoot = document.getElementById("sceneRoot");
+    this.messageBox = document.getElementById("messageBox");
+    this.startOverlay = document.getElementById("startOverlay");
+    this.pauseOverlay = document.getElementById("pauseOverlay");
+    this.gameOverOverlay = document.getElementById("gameOverOverlay");
+    this.ui = {
+      catsCount: document.getElementById("catsCount"),
+      distanceCount: document.getElementById("distanceCount"),
+      healthCount: document.getElementById("healthCount"),
+      bestCount: document.getElementById("bestCount"),
+      fishCooldown: document.getElementById("fishCooldown"),
+      shieldCooldown: document.getElementById("shieldCooldown"),
+      shieldTimer: document.getElementById("shieldTimer"),
+      altitudeState: document.getElementById("altitudeState"),
+      finalDistance: document.getElementById("finalDistance"),
+      recordDistance: document.getElementById("recordDistance"),
+      finalCats: document.getElementById("finalCats")
+    };
+
+    this.bestDistance = Number(window.localStorage.getItem(STORAGE_KEY) || "0");
+    this.keys = {};
+    this.clock = new THREE.Clock();
+    this.elapsedTime = 0;
+    this.messageTimer = 0;
+    this.fishDrops = [];
+    this.explosions = [];
+    this.bullets = [];
+    this.pendingShots = [];
+    this.trees = [];
+    this.catGroups = [];
+    this.droneVelocity = new THREE.Vector3();
+
+    this.setupThree();
+    this.setupScene();
+    this.bindEvents();
+    this.resetGame();
+    this.animate();
+  }
+
+  setupThree() {
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    this.sceneRoot.appendChild(this.renderer.domElement);
+
+    this.scene = new THREE.Scene();
+    this.scene.fog = new THREE.FogExp2(0x08111f, 0.008);
+
+    this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+
+    this.worldGroup = new THREE.Group();
+    this.hazardGroup = new THREE.Group();
+    this.actorGroup = new THREE.Group();
+    this.effectGroup = new THREE.Group();
+
+    this.scene.add(this.worldGroup);
+    this.scene.add(this.hazardGroup);
+    this.scene.add(this.actorGroup);
+    this.scene.add(this.effectGroup);
+  }
+
+  setupScene() {
+    const ambient = new THREE.AmbientLight(0x9fb6ff, 0.7);
+    const hemi = new THREE.HemisphereLight(0x9ad4ff, 0x102334, 1.1);
+    const sun = new THREE.DirectionalLight(0xffffff, 1.15);
+    sun.position.set(20, 28, -10);
+    this.scene.add(ambient, hemi, sun);
+
+    const groundMaterial = new THREE.MeshStandardMaterial({
+      color: 0x143622,
+      roughness: 0.9,
+      metalness: 0.05
+    });
+    this.ground = new THREE.Mesh(new THREE.PlaneGeometry(140, 1600), groundMaterial);
+    this.ground.rotation.x = -Math.PI / 2;
+    this.ground.position.y = 0;
+    this.worldGroup.add(this.ground);
+
+    const canyonMaterial = new THREE.MeshStandardMaterial({
+      color: 0x1c2436,
+      roughness: 0.96
+    });
+    this.leftWall = new THREE.Mesh(new THREE.BoxGeometry(16, 28, 1600), canyonMaterial);
+    this.rightWall = this.leftWall.clone();
+    this.leftWall.position.set(-40, 10, 0);
+    this.rightWall.position.set(40, 10, 0);
+    this.worldGroup.add(this.leftWall, this.rightWall);
+
+    this.trackMarkers = [];
+    const markerMaterial = new THREE.MeshStandardMaterial({
+      color: 0x99d7ff,
+      emissive: 0x1c5c8c,
+      emissiveIntensity: 1.8
+    });
+    for (let index = 0; index < 24; index += 1) {
+      const marker = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.08, 10), markerMaterial);
+      marker.position.set(0, 0.03, index * 32);
+      this.worldGroup.add(marker);
+      this.trackMarkers.push(marker);
+    }
+
+    const starsGeometry = new THREE.BufferGeometry();
+    const starPositions = [];
+    for (let index = 0; index < 350; index += 1) {
+      starPositions.push(randRange(-320, 320), randRange(70, 220), randRange(-400, 900));
+    }
+    starsGeometry.setAttribute("position", new THREE.Float32BufferAttribute(starPositions, 3));
+    const stars = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ color: 0xd5ebff, size: 1.5, sizeAttenuation: true }));
+    this.scene.add(stars);
+  }
+
+  bindEvents() {
+    document.getElementById("startGameBtn").addEventListener("click", () => this.startGame());
+    document.getElementById("resumeGameBtn").addEventListener("click", () => this.togglePause(false));
+    document.getElementById("restartGameBtn").addEventListener("click", () => this.restartGame());
+    document.getElementById("retryGameBtn").addEventListener("click", () => this.restartGame());
+
+    window.addEventListener("resize", () => this.handleResize());
+
+    window.addEventListener("keydown", (event) => {
+      if (["Space", "ControlLeft", "ControlRight", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.code)) {
+        event.preventDefault();
+      }
+
+      if (event.code === "Escape") {
+        event.preventDefault();
+        if (!this.state.started || this.state.gameOver) {
+          return;
+        }
+        this.togglePause();
+        return;
+      }
+
+      this.keys[event.code] = true;
+      if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(event.code)) {
+        this.state.clickTarget = null;
+      }
+    });
+
+    window.addEventListener("keyup", (event) => {
+      this.keys[event.code] = false;
+    });
+
+    this.renderer.domElement.addEventListener("pointerdown", (event) => {
+      if (!this.state.started || this.state.paused || this.state.gameOver) {
+        return;
+      }
+      this.setClickTarget(event);
+    });
+  }
+
+  resetGame() {
+    this.state = {
+      started: false,
+      paused: false,
+      gameOver: false,
+      health: 100,
+      distance: 0,
+      catsExploded: 0,
+      fishCooldown: 0,
+      shieldCooldown: 0,
+      shieldTime: 0,
+      invulnerability: 0,
+      clickTarget: null,
+      pvoBurstTimer: 2.2
+    };
+    this.elapsedTime = 0;
+    this.messageTimer = 0;
+    this.keys = {};
+    this.droneVelocity.set(0, 0, 0);
+
+    this.clearGroup(this.hazardGroup);
+    this.clearGroup(this.actorGroup);
+    this.clearGroup(this.effectGroup);
+    this.fishDrops = [];
+    this.explosions = [];
+    this.bullets = [];
+    this.pendingShots = [];
+    this.trees = [];
+    this.catGroups = [];
+
+    this.createDrone();
+    this.createPvo();
+
+    this.drone.position.set(0, 10, 0);
+    this.nextTreeSpawnZ = 40;
+    this.nextCatSpawnZ = 55;
+    this.spawnInitialWorld();
+    this.hideOverlay(this.pauseOverlay);
+    this.hideOverlay(this.gameOverOverlay);
+    this.showOverlay(this.startOverlay);
+    this.updateUI();
+    this.showMessage("Подготовься к полету и нажми кнопку старта.", 2.6);
+  }
+
+  restartGame() {
+    this.resetGame();
+    this.startGame();
+  }
+
+  startGame() {
+    this.hideOverlay(this.startOverlay);
+    this.hideOverlay(this.pauseOverlay);
+    this.hideOverlay(this.gameOverOverlay);
+    this.state.started = true;
+    this.state.paused = false;
+    this.state.gameOver = false;
+    this.clock.start();
+    this.showMessage("Полет начался. ПВО уже ищет тебя.", 2.2);
+  }
+
+  togglePause(forceValue) {
+    if (!this.state.started || this.state.gameOver) {
+      return;
+    }
+    const nextValue = typeof forceValue === "boolean" ? forceValue : !this.state.paused;
+    this.state.paused = nextValue;
+    if (this.state.paused) {
+      this.showOverlay(this.pauseOverlay);
+      this.showMessage("Пауза.", 1.2);
+    } else {
+      this.hideOverlay(this.pauseOverlay);
+      this.clock.getDelta();
+      this.showMessage("Полет продолжается.", 1.2);
+    }
+  }
+
+  createDrone() {
+    this.drone = new THREE.Group();
+
+    const body = new THREE.Mesh(
+      new THREE.BoxGeometry(2.8, 1, 3.6),
+      new THREE.MeshStandardMaterial({ color: 0x5fd7ff, emissive: 0x0a4d6c, emissiveIntensity: 1.1 })
+    );
+    body.castShadow = true;
+    this.drone.add(body);
+
+    const nose = new THREE.Mesh(
+      new THREE.ConeGeometry(0.75, 1.6, 5),
+      new THREE.MeshStandardMaterial({ color: 0xb8f0ff, emissive: 0x1b5a72, emissiveIntensity: 0.8 })
+    );
+    nose.rotation.x = Math.PI / 2;
+    nose.position.set(0, 0, 2.2);
+    this.drone.add(nose);
+
+    const wingGeometry = new THREE.BoxGeometry(6.2, 0.2, 0.6);
+    const wingMaterial = new THREE.MeshStandardMaterial({ color: 0x1a2e48, metalness: 0.55, roughness: 0.3 });
+    const wings = new THREE.Mesh(wingGeometry, wingMaterial);
+    wings.position.y = 0.2;
+    this.drone.add(wings);
+
+    this.rotors = [];
+    const rotorPositions = [
+      [-2.4, 0.45, 1.2],
+      [2.4, 0.45, 1.2],
+      [-2.4, 0.45, -1.2],
+      [2.4, 0.45, -1.2]
+    ];
+    rotorPositions.forEach((position) => {
+      const rotor = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.1, 0.1, 0.2, 10),
+        new THREE.MeshStandardMaterial({ color: 0xdce8f4, emissive: 0x5ea9d6, emissiveIntensity: 0.5 })
+      );
+      rotor.rotation.z = Math.PI / 2;
+      rotor.position.set(position[0], position[1], position[2]);
+
+      const blade = new THREE.Mesh(
+        new THREE.BoxGeometry(1.6, 0.04, 0.18),
+        new THREE.MeshBasicMaterial({ color: 0xe7f4ff, transparent: true, opacity: 0.75 })
+      );
+      rotor.add(blade);
+      this.rotors.push(rotor);
+      this.drone.add(rotor);
+    });
+
+    this.droneShield = new THREE.Mesh(
+      new THREE.SphereGeometry(2.65, 20, 20),
+      new THREE.MeshBasicMaterial({
+        color: 0x55d8ff,
+        transparent: true,
+        opacity: 0.15,
+        wireframe: true
+      })
+    );
+    this.droneShield.visible = false;
+    this.drone.add(this.droneShield);
+
+    this.actorGroup.add(this.drone);
+  }
+
+  createPvo() {
+    this.pvo = new THREE.Group();
+    const base = new THREE.Mesh(
+      new THREE.CylinderGeometry(4.2, 5.2, 3.4, 10),
+      new THREE.MeshStandardMaterial({ color: 0x646c78, roughness: 0.85 })
+    );
+    base.position.y = 1.7;
+    this.pvo.add(base);
+
+    const head = new THREE.Mesh(
+      new THREE.BoxGeometry(5.4, 2.1, 4.8),
+      new THREE.MeshStandardMaterial({ color: 0x4b5969, metalness: 0.25, roughness: 0.48 })
+    );
+    head.position.y = 4.2;
+    this.pvoHead = head;
+    this.pvo.add(head);
+
+    this.muzzles = [];
+    [-1.7, -0.6, 0.6, 1.7].forEach((xOffset) => {
+      const barrel = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.24, 0.24, 5.4, 12),
+        new THREE.MeshStandardMaterial({ color: 0x2f3945, metalness: 0.55, roughness: 0.3 })
+      );
+      barrel.rotation.x = Math.PI / 2;
+      barrel.position.set(xOffset, 0.2, 2.9);
+      head.add(barrel);
+      this.muzzles.push(barrel);
+    });
+
+    this.pvo.position.set(0, 0, 180);
+    this.actorGroup.add(this.pvo);
+  }
+
+  spawnInitialWorld() {
+    while (this.nextTreeSpawnZ < TREE_SPAWN_AHEAD) {
+      this.maybeSpawnTree();
+    }
+    while (this.nextCatSpawnZ < CAT_SPAWN_AHEAD) {
+      this.spawnCatGroup();
+    }
+  }
+
+  maybeSpawnTree() {
+    const z = this.nextTreeSpawnZ;
+    this.nextTreeSpawnZ += randRange(18, 34);
+    if (Math.random() < 0.15) {
+      return;
+    }
+
+    const x = randRange(-22, 22);
+    const height = randRange(8, 16);
+    const tree = new THREE.Group();
+    const trunk = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.55, 0.8, height * 0.38, 8),
+      new THREE.MeshStandardMaterial({ color: 0x7b4d27, roughness: 0.98 })
+    );
+    trunk.position.y = height * 0.19;
+    tree.add(trunk);
+
+    const leaves = new THREE.Mesh(
+      new THREE.ConeGeometry(height * 0.22, height * 0.72, 8),
+      new THREE.MeshStandardMaterial({ color: 0x2d8f41, roughness: 0.95 })
+    );
+    leaves.position.y = height * 0.65;
+    tree.add(leaves);
+
+    tree.position.set(x, 0, z);
+    this.hazardGroup.add(tree);
+    this.trees.push({
+      mesh: tree,
+      x,
+      z,
+      radius: height * 0.18 + 0.8,
+      height,
+      hitCooldown: 0
+    });
+  }
+
+  spawnCatGroup() {
+    const z = this.nextCatSpawnZ;
+    this.nextCatSpawnZ += randRange(28, 44);
+
+    const baseX = randRange(-18, 18);
+    const catCount = randInt(1, 3);
+    const group = new THREE.Group();
+    group.position.set(0, 0, z);
+    this.hazardGroup.add(group);
+
+    const cats = [];
+    for (let index = 0; index < catCount; index += 1) {
+      const xOffset = baseX + (index - (catCount - 1) / 2) * 3.1;
+      const catRoot = new THREE.Group();
+      catRoot.position.set(xOffset, 0, 0);
+
+      const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xe2a65c, roughness: 0.9 });
+      const body = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.9, 1.8), bodyMaterial);
+      body.position.y = 1;
+      catRoot.add(body);
+
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.85, 0.95), bodyMaterial.clone());
+      head.position.set(0, 1.65, 0.65);
+      catRoot.add(head);
+
+      const paw = new THREE.Mesh(
+        new THREE.BoxGeometry(0.34, 1.6, 0.34),
+        new THREE.MeshStandardMaterial({ color: 0xffd1a5, roughness: 0.7 })
+      );
+      paw.position.set(0.62, 0.95, 0.82);
+      paw.rotation.z = -0.18;
+      catRoot.add(paw);
+
+      const ears = new THREE.Mesh(
+        new THREE.ConeGeometry(0.18, 0.35, 4),
+        new THREE.MeshStandardMaterial({ color: 0xc97e3f, roughness: 0.9 })
+      );
+      ears.position.set(-0.18, 2.18, 0.65);
+      ears.rotation.z = 0.5;
+      catRoot.add(ears);
+
+      const ears2 = ears.clone();
+      ears2.position.x = 0.18;
+      ears2.rotation.z = -0.5;
+      catRoot.add(ears2);
+
+      group.add(catRoot);
+      cats.push({
+        root: catRoot,
+        paw,
+        body,
+        head,
+        x: xOffset,
+        attackCooldown: randRange(0.25, 1.1),
+        attackAnim: 0,
+        stunTime: 0
+      });
+    }
+
+    this.catGroups.push({ mesh: group, z, cats });
+  }
+
+  clearGroup(group) {
+    while (group.children.length) {
+      group.remove(group.children[0]);
+    }
+  }
+
+  handleResize() {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  }
+
+  setClickTarget(event) {
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    const normalizedX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    const normalizedY = 1 - ((event.clientY - rect.top) / rect.height);
+    this.state.clickTarget = {
+      x: clamp(-normalizedX * (MAX_SIDE * 0.9), -MAX_SIDE, MAX_SIDE),
+      y: clamp(MIN_ALTITUDE + normalizedY * (MAX_ALTITUDE - MIN_ALTITUDE), MIN_ALTITUDE, MAX_ALTITUDE)
+    };
+  }
+
+  animate() {
+    requestAnimationFrame(() => this.animate());
+    const delta = Math.min(this.clock.getDelta() || 0.016, 0.05);
+
+    if (this.state.started && !this.state.paused && !this.state.gameOver) {
+      this.updateGameplay(delta);
+    }
+
+    this.updateMessage(delta);
+    this.updateAmbientAnimation(delta);
+    this.updateCamera();
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  updateGameplay(delta) {
+    this.elapsedTime += delta;
+    this.state.distance += FORWARD_SPEED * delta;
+    this.state.fishCooldown = Math.max(0, this.state.fishCooldown - delta);
+    this.state.shieldCooldown = Math.max(0, this.state.shieldCooldown - delta);
+    this.state.shieldTime = Math.max(0, this.state.shieldTime - delta);
+    this.state.invulnerability = Math.max(0, this.state.invulnerability - delta);
+    this.state.pvoBurstTimer -= delta;
+
+    this.handleAbilities();
+    this.updateDroneMovement(delta);
+    this.updateWorld();
+    this.updatePvo(delta);
+    this.updateBullets(delta);
+    this.updateFish(delta);
+    this.updateCats(delta);
+    this.updateTrees(delta);
+    this.updateExplosions(delta);
+    this.spawnAhead();
+    this.updateUI();
+  }
+
+  updateDroneMovement(delta) {
+    this.drone.position.z += FORWARD_SPEED * delta;
+
+    const left = this.keys.KeyA ? 1 : 0;
+    const right = this.keys.KeyD ? -1 : 0;
+    const down = this.keys.KeyS ? -1 : 0;
+    const up = this.keys.KeyW ? 1 : 0;
+    const horizontalInput = left + right;
+    const verticalInput = up + down;
+
+    const hasDirectInput = horizontalInput !== 0 || verticalInput !== 0;
+
+    let targetHorizontalVelocity = 0;
+    let targetVerticalVelocity = 0;
+
+    if (hasDirectInput) {
+      targetHorizontalVelocity = horizontalInput * SIDE_SPEED;
+      targetVerticalVelocity = verticalInput * VERTICAL_SPEED;
+    } else if (this.state.clickTarget) {
+      const dx = this.state.clickTarget.x - this.drone.position.x;
+      const dy = this.state.clickTarget.y - this.drone.position.y;
+      targetHorizontalVelocity = clamp(dx * 2.2, -SIDE_SPEED, SIDE_SPEED);
+      targetVerticalVelocity = clamp(dy * 2.2, -VERTICAL_SPEED, VERTICAL_SPEED);
+      if (Math.abs(dx) < 0.35 && Math.abs(dy) < 0.35) {
+        this.state.clickTarget = null;
+      }
+    }
+
+    const smoothing = clamp(delta * 6, 0, 1);
+    this.droneVelocity.x = lerp(this.droneVelocity.x, targetHorizontalVelocity, smoothing);
+    this.droneVelocity.y = lerp(this.droneVelocity.y, targetVerticalVelocity, smoothing);
+
+    this.drone.position.x = clamp(this.drone.position.x + this.droneVelocity.x * delta, -MAX_SIDE, MAX_SIDE);
+    this.drone.position.y = clamp(this.drone.position.y + this.droneVelocity.y * delta, MIN_ALTITUDE, MAX_ALTITUDE);
+
+    this.drone.rotation.z = THREE.MathUtils.lerp(this.drone.rotation.z, -this.droneVelocity.x * 0.018, 0.12);
+    this.drone.rotation.x = THREE.MathUtils.lerp(this.drone.rotation.x, this.droneVelocity.y * 0.012, 0.12);
+  }
+
+  updateWorld() {
+    this.ground.position.z = this.drone.position.z + 470;
+    this.leftWall.position.z = this.ground.position.z;
+    this.rightWall.position.z = this.ground.position.z;
+
+    const baseMarkerZ = Math.floor((this.drone.position.z - 40) / 32) * 32;
+    this.trackMarkers.forEach((marker, index) => {
+      marker.position.z = baseMarkerZ + index * 32;
+    });
+  }
+
+  handleAbilities() {
+    if (this.keys.Space && this.state.fishCooldown <= 0) {
+      this.dropFish();
+      this.keys.Space = false;
+    }
+
+    if ((this.keys.ControlLeft || this.keys.ControlRight) && this.state.shieldCooldown <= 0) {
+      this.activateShield();
+      this.keys.ControlLeft = false;
+      this.keys.ControlRight = false;
+    }
+
+    this.droneShield.visible = this.state.shieldTime > 0;
+    this.droneShield.rotation.y += 0.08;
+  }
+
+  dropFish() {
+    const fish = new THREE.Mesh(
+      new THREE.SphereGeometry(0.55, 14, 14),
+      new THREE.MeshStandardMaterial({ color: 0xffa95b, emissive: 0xff6517, emissiveIntensity: 0.9 })
+    );
+    fish.scale.set(1.2, 0.65, 2.2);
+    fish.position.copy(this.drone.position);
+    fish.position.y -= 0.8;
+    this.effectGroup.add(fish);
+
+    this.fishDrops.push({
+      mesh: fish,
+      velocity: new THREE.Vector3(0, -4.5, 4.5)
+    });
+
+    this.state.fishCooldown = 25;
+    this.showMessage("Рыбка-обманка сброшена.", 1.5);
+  }
+
+  activateShield() {
+    this.state.shieldTime = 3;
+    this.state.shieldCooldown = 20;
+    this.showMessage("Щит ПВО активирован на 3 секунды.", 1.6);
+  }
+
+  updatePvo(delta) {
+    const aheadDistance = 170;
+    this.pvo.position.z = this.drone.position.z + aheadDistance;
+    this.pvo.position.x = Math.sin(this.elapsedTime * 0.35) * 8;
+    this.pvoHead.lookAt(this.drone.position.x, this.drone.position.y, this.drone.position.z);
+
+    const canShoot = this.drone.position.y > LOW_ALTITUDE_LIMIT;
+    if (canShoot && this.state.pvoBurstTimer <= 0) {
+      this.startPvoBurst();
+      this.state.pvoBurstTimer = 5;
+    }
+
+    for (let index = this.pendingShots.length - 1; index >= 0; index -= 1) {
+      const shot = this.pendingShots[index];
+      shot.delay -= delta;
+      if (shot.delay <= 0) {
+        this.spawnBullet(shot.muzzleIndex);
+        this.pendingShots.splice(index, 1);
+      }
+    }
+  }
+
+  startPvoBurst() {
+    const bulletCount = randInt(4, 7);
+    for (let index = 0; index < bulletCount; index += 1) {
+      this.pendingShots.push({
+        delay: index * 0.22,
+        muzzleIndex: index % this.muzzles.length
+      });
+    }
+    this.showMessage(`ПВО выпускает очередь из ${bulletCount} пуль.`, 1.7);
+  }
+
+  spawnBullet(muzzleIndex) {
+    const bullet = new THREE.Mesh(
+      new THREE.SphereGeometry(0.45, 14, 14),
+      new THREE.MeshStandardMaterial({ color: 0xffde59, emissive: 0xff8a00, emissiveIntensity: 1.2 })
+    );
+
+    const muzzle = this.muzzles[muzzleIndex];
+    const worldPosition = new THREE.Vector3();
+    muzzle.getWorldPosition(worldPosition);
+    bullet.position.copy(worldPosition);
+    this.effectGroup.add(bullet);
+
+    const target = this.drone.position.clone();
+    target.x += randRange(-2.6, 2.6);
+    target.y += randRange(-1.8, 1.8);
+    target.z += randRange(2, 12);
+
+    const velocity = target.sub(worldPosition).normalize().multiplyScalar(11);
+    this.bullets.push({
+      mesh: bullet,
+      velocity,
+      life: 20
+    });
+  }
+
+  updateBullets(delta) {
+    for (let index = this.bullets.length - 1; index >= 0; index -= 1) {
+      const bullet = this.bullets[index];
+      bullet.mesh.position.addScaledVector(bullet.velocity, delta);
+      bullet.life -= delta;
+
+      if (bullet.life <= 0 || bullet.mesh.position.z < this.drone.position.z - 30) {
+        this.removeBullet(index);
+        continue;
+      }
+
+      if (bullet.mesh.position.distanceTo(this.drone.position) < 2.2) {
+        if (this.state.shieldTime > 0) {
+          this.makeExplosion(bullet.mesh.position.clone(), 0x72e9ff, 0.45);
+          this.showMessage("Щит поглотил попадание ПВО.", 0.9);
+        } else {
+          this.applyDamage(14, "ПВО попало по дрону.");
+          this.makeExplosion(bullet.mesh.position.clone(), 0xffc14d, 0.35);
+        }
+        this.removeBullet(index);
+      }
+    }
+  }
+
+  removeBullet(index) {
+    const bullet = this.bullets[index];
+    this.effectGroup.remove(bullet.mesh);
+    this.bullets.splice(index, 1);
+  }
+
+  updateFish(delta) {
+    for (let index = this.fishDrops.length - 1; index >= 0; index -= 1) {
+      const fish = this.fishDrops[index];
+      fish.velocity.y -= 14 * delta;
+      fish.mesh.position.addScaledVector(fish.velocity, delta);
+      fish.mesh.rotation.z += 7 * delta;
+      fish.mesh.rotation.x += 3 * delta;
+
+      if (fish.mesh.position.y <= 0.7) {
+        const explodeAt = fish.mesh.position.clone();
+        explodeAt.y = 1;
+        this.effectGroup.remove(fish.mesh);
+        this.fishDrops.splice(index, 1);
+        this.explodeFish(explodeAt);
+      }
+    }
+  }
+
+  explodeFish(position) {
+    let stunnedCats = 0;
+    const radius = 10;
+
+    this.catGroups.forEach((group) => {
+      if (Math.abs(group.z - position.z) > radius) {
+        return;
+      }
+      group.cats.forEach((cat) => {
+        const dx = cat.x - position.x;
+        const dz = group.z - position.z;
+        if ((dx * dx) + (dz * dz) <= radius * radius) {
+          cat.stunTime = Math.max(cat.stunTime, 6);
+          stunnedCats += 1;
+        }
+      });
+    });
+
+    this.state.catsExploded += stunnedCats;
+    this.makeExplosion(position, 0xff8c45, 0.8);
+    this.showMessage(
+      stunnedCats > 0 ? `Рыбка взорвалась и оглушила котов: ${stunnedCats}.` : "Рыбка взорвалась, но котов рядом не было.",
+      1.8
+    );
+  }
+
+  makeExplosion(position, color, scale) {
+    const explosion = new THREE.Mesh(
+      new THREE.SphereGeometry(1, 18, 18),
+      new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.5 })
+    );
+    explosion.position.copy(position);
+    explosion.scale.setScalar(scale);
+    this.effectGroup.add(explosion);
+    this.explosions.push({ mesh: explosion, life: 0.55, grow: scale * 14 });
+  }
+
+  updateExplosions(delta) {
+    for (let index = this.explosions.length - 1; index >= 0; index -= 1) {
+      const explosion = this.explosions[index];
+      explosion.life -= delta;
+      explosion.mesh.scale.addScalar(delta * explosion.grow);
+      explosion.mesh.material.opacity = Math.max(0, explosion.life);
+      if (explosion.life <= 0) {
+        this.effectGroup.remove(explosion.mesh);
+        this.explosions.splice(index, 1);
+      }
+    }
+  }
+
+  updateCats(delta) {
+    const isLow = this.drone.position.y <= LOW_ALTITUDE_LIMIT;
+    for (let groupIndex = this.catGroups.length - 1; groupIndex >= 0; groupIndex -= 1) {
+      const group = this.catGroups[groupIndex];
+      group.mesh.position.z = group.z;
+
+      if (group.z < this.drone.position.z - 40) {
+        this.hazardGroup.remove(group.mesh);
+        this.catGroups.splice(groupIndex, 1);
+        continue;
+      }
+
+      group.cats.forEach((cat, catIndex) => {
+        cat.attackCooldown -= delta;
+        cat.attackAnim = Math.max(0, cat.attackAnim - delta * 4);
+        cat.stunTime = Math.max(0, cat.stunTime - delta);
+
+        cat.root.position.y = Math.sin(this.elapsedTime * 3.5 + catIndex) * 0.08;
+        cat.body.material.color.setHex(cat.stunTime > 0 ? 0x5fa7ff : 0xe2a65c);
+        cat.head.material.color.setHex(cat.stunTime > 0 ? 0x8cc1ff : 0xe2a65c);
+        cat.paw.rotation.z = cat.attackAnim > 0 ? 0.85 - cat.attackAnim * 1.2 : -0.18;
+
+        if (!isLow || cat.stunTime > 0) {
+          return;
+        }
+
+        const nearZ = Math.abs(group.z - this.drone.position.z) < 5.5;
+        const nearX = Math.abs(cat.x - this.drone.position.x) < 3.6;
+        if (nearZ && nearX && cat.attackCooldown <= 0) {
+          cat.attackCooldown = 1.3;
+          cat.attackAnim = 1;
+          this.applyDamage(18, "Кот задел дрон лапой.");
+        }
+      });
+    }
+  }
+
+  updateTrees(delta) {
+    for (let index = this.trees.length - 1; index >= 0; index -= 1) {
+      const tree = this.trees[index];
+      tree.hitCooldown = Math.max(0, tree.hitCooldown - delta);
+      if (tree.z < this.drone.position.z - 60) {
+        this.hazardGroup.remove(tree.mesh);
+        this.trees.splice(index, 1);
+        continue;
+      }
+
+      const nearZ = Math.abs(tree.z - this.drone.position.z) < 3.2;
+      const nearX = Math.abs(tree.x - this.drone.position.x) < tree.radius + 0.8;
+      const lowEnough = this.drone.position.y < tree.height;
+
+      if (nearZ && nearX && lowEnough && tree.hitCooldown <= 0) {
+        tree.hitCooldown = 1.2;
+        this.applyDamage(24, "Дрон врезался в дерево.");
+      }
+    }
+  }
+
+  spawnAhead() {
+    while (this.nextTreeSpawnZ < this.drone.position.z + TREE_SPAWN_AHEAD) {
+      this.maybeSpawnTree();
+    }
+    while (this.nextCatSpawnZ < this.drone.position.z + CAT_SPAWN_AHEAD) {
+      this.spawnCatGroup();
+    }
+  }
+
+  applyDamage(amount, text) {
+    if (this.state.gameOver) {
+      return;
+    }
+    if (this.state.invulnerability > 0) {
+      return;
+    }
+
+    this.state.health = Math.max(0, this.state.health - amount);
+    this.state.invulnerability = 0.75;
+    this.showMessage(text, 1.3);
+
+    const flashColor = 0xff4d6d;
+    this.makeExplosion(this.drone.position.clone(), flashColor, 0.18);
+
+    if (this.state.health <= 0) {
+      this.finishGame();
+    }
+  }
+
+  finishGame() {
+    this.state.gameOver = true;
+    this.state.started = false;
+
+    const traveled = Math.floor(this.state.distance);
+    if (traveled > this.bestDistance) {
+      this.bestDistance = traveled;
+      window.localStorage.setItem(STORAGE_KEY, String(this.bestDistance));
+    }
+
+    this.ui.finalDistance.textContent = String(traveled);
+    this.ui.recordDistance.textContent = String(this.bestDistance);
+    this.ui.finalCats.textContent = String(this.state.catsExploded);
+    this.updateUI();
+    this.showOverlay(this.gameOverOverlay);
+    this.showMessage("Дрон потерян. Можно начать заново.", 2.5);
+  }
+
+  updateAmbientAnimation(delta) {
+    this.rotors?.forEach((rotor) => {
+      rotor.rotation.x += delta * 24;
+    });
+
+    if (!this.drone) {
+      return;
+    }
+
+    if (!this.state.started || this.state.paused || this.state.gameOver) {
+      this.drone.position.y += Math.sin(this.elapsedTime * 2.2) * 0.002;
+    }
+  }
+
+  updateCamera() {
+    if (!this.drone) {
+      return;
+    }
+    const targetPosition = new THREE.Vector3(
+      this.drone.position.x * 0.65,
+      this.drone.position.y + 6.5,
+      this.drone.position.z - 17
+    );
+    this.camera.position.lerp(targetPosition, 0.08);
+
+    const lookTarget = new THREE.Vector3(
+      this.drone.position.x * 0.45,
+      this.drone.position.y + 1.6,
+      this.drone.position.z + 42
+    );
+    this.camera.lookAt(lookTarget);
+  }
+
+  updateMessage(delta) {
+    if (this.messageTimer <= 0) {
+      return;
+    }
+    this.messageTimer -= delta;
+    if (this.messageTimer <= 0) {
+      this.messageBox.classList.remove("visible");
+    }
+  }
+
+  showMessage(text, duration = 1.6) {
+    this.messageBox.textContent = text;
+    this.messageTimer = duration;
+    this.messageBox.classList.add("visible");
+  }
+
+  showOverlay(element) {
+    element.classList.remove("hidden");
+  }
+
+  hideOverlay(element) {
+    element.classList.add("hidden");
+  }
+
+  updateUI() {
+    const distanceValue = Math.floor(this.state.distance);
+    this.ui.catsCount.textContent = String(this.state.catsExploded);
+    this.ui.distanceCount.textContent = String(distanceValue);
+    this.ui.healthCount.textContent = String(Math.floor(this.state.health));
+    this.ui.bestCount.textContent = String(this.bestDistance);
+    this.ui.fishCooldown.textContent = this.state.fishCooldown > 0 ? `${this.state.fishCooldown.toFixed(1)} c` : "Готова";
+    this.ui.shieldCooldown.textContent = this.state.shieldCooldown > 0 ? `${this.state.shieldCooldown.toFixed(1)} c` : "Готов";
+    this.ui.shieldTimer.textContent = `${this.state.shieldTime.toFixed(1)} c`;
+    this.ui.altitudeState.textContent = this.drone.position.y <= LOW_ALTITUDE_LIMIT ? "Низко: зона котов" : "Высоко: зона ПВО";
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
- new MonopolyGame();
+  new DroneCatsGame();
 });

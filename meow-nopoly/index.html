@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Мяу-нополия</title>
+ <link rel="stylesheet" href="style.css">
+</head>
+<body>
+ <section class="room-menu-overlay" id="roomMenuOverlay">
+ <div class="room-menu-card">
+ <div class="room-menu-kicker">Комнаты</div>
+ <h2>Перед игрой выбери комнату</h2>
+ <div class="room-menu-rank" id="roomRankInfo"></div>
+ <label class="room-menu-field" for="roomPlayerCount">
+ <span>Игроков в комнате</span>
+ <select id="roomPlayerCount">
+ <option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option>
+ </select>
+ </label>
+ <div class="room-menu-actions">
+ <button id="createRoomBtn" class="dice-btn primary-action">Создать комнату</button>
+ <label class="room-menu-field" for="friendsRoomSelect">
+ <span>Комнаты друзей</span>
+ <select id="friendsRoomSelect"></select>
+ </label>
+ <button id="joinFriendsRoomBtn" class="dice-btn">Зайти к друзьям</button>
+ <label class="room-menu-field" for="joinRoomIdInput">
+ <span>Войти по ID</span>
+ <input id="joinRoomIdInput" type="text" maxlength="12" placeholder="Например: CAT12345">
+ </label>
+ <button id="joinRoomByIdBtn" class="dice-btn">Зайти по ID</button>
+ <button id="startRoomGameBtn" class="dice-btn secondary-action" disabled>Начать игру</button>
+ </div>
+ <div class="room-menu-status" id="roomMenuStatus">Сначала создай комнату, зайди к друзьям или введи ID.</div>
+ </div>
+ </section>
+ <div class="game-container">
+ <div class="board-stage">
+ <div class="game-board" id="gameBoard"></div>
+ <section class="board-center-panel">
+ <div class="board-center-title">События партии</div>
+ <div class="board-center-feed" id="boardCenterInfo"></div>
+ </section>
+ </div>
+ <div class="game-ui">
+ <section class="panel hero-panel">
+ <h1>Мяу-нополия</h1>
+ <div class="room-brief" id="roomBrief">Комната не выбрана</div>
+ <label class="player-count-picker" for="playerCount">
+ <span>Игроков в комнате</span>
+ <select id="playerCount">
+ <option value="2">2</option>
+ <option value="3">3</option>
+ <option value="4">4</option>
+ <option value="5">5</option>
+ <option value="6">6</option>
+ </select>
+ </label>
+ <div class="current-player-name" id="currentPlayerName"></div>
+ <div class="current-player-status" id="currentPlayerStatus"></div>
+ </section>
+
+ <section class="panel" id="playerInfo"></section>
+
+ <section class="panel">
+ <div class="section-title">Действия</div>
+ <div class="actions-grid">
+ <button id="rollDice" class="dice-btn primary-action">Бросить кубики</button>
+ <button id="payJailFine" class="dice-btn">Заплатить 50</button>
+ <button id="useJailCard" class="dice-btn">Использовать карту</button>
+ <button id="buildBtn" class="dice-btn">Строить</button>
+ <button id="sellBuildingBtn" class="dice-btn">Продать улучшение</button>
+ <button id="mortgageBtn" class="dice-btn">Заложить</button>
+ <button id="unmortgageBtn" class="dice-btn">Выкупить залог</button>
+ <button id="restartGame" class="dice-btn secondary-action">Новая игра</button>
+ </div>
+ <div class="dice-result" id="diceResult"></div>
+ </section>
+
+ <section class="panel">
+ <div class="section-title">Топ в комнате</div>
+ <div class="players-list" id="allPlayers"></div>
+ </section>
+
+ <section class="panel">
+ <div class="section-title">Текущая клетка</div>
+ <div class="current-cell" id="currentCell"></div>
+ </section>
+
+ <section class="panel log-panel">
+ <div class="section-title">Журнал</div>
+ <div class="game-log" id="gameLog"></div>
+ </section>
+ </div>
+ </div>
+ <script src="game.js?v=4"></script>
+</body>
+</html>

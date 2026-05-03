@@ -42,14 +42,16 @@
  radial-gradient(800px 520px at 60% 90%, rgba(34, 197, 94, 0.1), transparent 60%), var(--bg);
  color: var(--text);
  display: grid;
- place-items: center;
+place-items: start center;
  padding: 24px;
  }
 
  .app {
  width: min(1200px, 100%);
  display: grid;
- gap: 16px;
+ column-gap: 16px;
+ row-gap: 20px;
+ align-items: start;
  }
 
  header {
@@ -106,7 +108,8 @@
 
  main {
  display: block;
- width: min(1200px, 100%);
+width: 100%;
+min-width: 0;
  }
 
  @media (max-width: 860px) {
@@ -573,23 +576,89 @@
  }
 
  .tabs {
- display: flex;
- gap: 10px;
- margin: 12px 0 18px;
- flex-wrap: wrap;
- width: min(1200px, 100%);
+display: flex;
+flex-direction: column;
+gap: 10px;
+margin: 0;
+width: 220px;
+padding: 14px;
+border: 1px solid var(--stroke);
+background: linear-gradient(180deg, var(--panel), rgba(255, 255, 255, 0.03));
+border-radius: 18px;
+box-shadow: 0 18px 60px var(--shadow);
+position: sticky;
+ top: 20px;
+align-self: start;
+ overflow: hidden;
+ transition: transform 0.24s ease, box-shadow 0.24s ease, background 0.24s ease, border-color 0.24s ease, padding 0.24s ease;
+ z-index: 5;
+}
+
+.sidebar-toggle {
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ align-self: flex-end;
+ width: 32px;
+ height: 32px;
+ padding: 0;
+ border: 1px solid var(--stroke);
+ border-radius: 10px;
+ background: rgba(255, 255, 255, 0.06);
+ color: var(--text);
+ cursor: pointer;
+ font-size: 16px;
+ font-weight: 700;
+ transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+ background: rgba(255, 255, 255, 0.12);
  }
+
+.content-shell {
+ display: grid;
+ grid-template-columns: 220px minmax(0, 1fr);
+ gap: 16px;
+ align-items: start;
+ min-height: 0;
+}
+
+.app.sidebar-collapsed .content-shell {
+ grid-template-columns: 0 minmax(0, 1fr);
+}
+
+.app.sidebar-collapsed .tabs {
+ padding: 0;
+ border-color: transparent;
+ background: transparent;
+ box-shadow: none;
+ overflow: visible;
+ transform: translateX(-188px);
+}
+
+.app.sidebar-collapsed .tab {
+ opacity: 0;
+ pointer-events: none;
+ transform: translateX(-12px);
+}
+
+.app.sidebar-collapsed .sidebar-toggle {
+ background: rgba(255, 255, 255, 0.08);
+ border-color: rgba(255, 255, 255, 0.16);
+ box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+}
 
  .tab {
  background: var(--panel2);
  border: 1px solid var(--stroke);
- flex: 1;
  color: #fff;
- padding: 8px 14px;
- border-radius: 999px;
+padding: 12px 14px;
+border-radius: 14px;
  cursor: pointer;
  font-weight: 600;
- transition: transform 0.15s, background 0.2s;
+text-align: left;
+transition: transform 0.15s, background 0.2s, border-color 0.2s;
  }
 
  .tab:hover {
@@ -615,9 +684,50 @@
 
  .page.active[data-page="shop"],
  .page.active[data-page="achievements"],
- .page.active[data-page="codes"] {
+.page.active[data-page="codes"],
+.page.active[data-page="friends"],
+.page.active[data-page="profile"] {
  display: block !important;
  }
+
+.drawer-page {
+ display: grid;
+ gap: 16px;
+}
+
+.drawer-card-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+ gap: 14px;
+}
+
+.drawer-info-card {
+ background: var(--panel2);
+ border: 1px solid var(--stroke);
+ border-radius: 16px;
+ padding: 16px;
+}
+
+.drawer-info-label {
+ margin: 0 0 8px;
+ font-size: 12px;
+ letter-spacing: 0.08em;
+ text-transform: uppercase;
+ color: var(--muted);
+}
+
+.drawer-info-value {
+ margin: 0;
+ font-size: 22px;
+ font-weight: 700;
+}
+
+.drawer-info-note {
+ margin: 6px 0 0;
+ color: var(--muted);
+ font-size: 14px;
+ line-height: 1.45;
+}
 
  @media (max-width: 768px) {
  .page.active {
@@ -808,6 +918,10 @@
  }
 
  @media (max-width: 768px) {
+ .app {
+ width: 100%;
+ }
+
  body {
  padding: 8px;
  }
@@ -835,30 +949,41 @@
  padding: 6px 8px;
  gap: 4px;
  }
+ .content-shell {
+ display: block;
+ }
  .tabs {
+ flex-direction: row;
  justify-content: center;
  gap: 6px;
+ width: 100%;
+ padding: 0;
+ border: none;
+ background: transparent;
+ box-shadow: none;
+ position: static;
+ transform: none;
+ overflow: visible;
+ }
+ .sidebar-toggle {
+ display: none;
  }
  .tab {
+ text-align: center;
  font-size: 12px;
  padding: 6px 10px;
+ border-radius: 999px;
  }
  }
 
  @media (min-width: 1024px) {
  .app {
+ width: min(1400px, 100%);
  max-width: 100%;
  padding: 20px;
  margin: 0;
  transform: none;
- height: 100vh;
- display: flex;
- flex-direction: column;
- }
-
- .tabs,
- main {
- width: 100%;
+ min-height: calc(100vh - 48px);
  }
 
  .page.active {
@@ -875,12 +1000,50 @@
  }
 
  /* Боковая панель: растягиваемая, макс 25% */
- .page.active > .panel:last-child {
+ .page.active > .panel:last-child:not(:first-child) {
  flex: 0 0 25%;
  max-width: 25%;
  min-width: 250px;
  resize: horizontal;
  overflow: auto;
+ }
+
+ .page.active[data-page="slot-game"] {
+ justify-content: center;
+ align-items: flex-start;
+ }
+
+ .page.active[data-page="slot-game"] > section.panel {
+ width: 1190px;
+ height: 589px;
+ max-width: 1190px;
+ max-height: 589px;
+ flex: 0 0 1190px;
+ display: grid;
+ grid-template-rows: auto auto 1fr;
+ overflow: hidden;
+ }
+
+ .page.active[data-page="slot-game"] > section.panel .slot {
+ min-height: 0;
+ padding: 18px 20px 14px;
+ }
+
+ .page.active[data-page="slot-game"] > section.panel .status {
+ flex: 0 0 auto;
+ }
+
+ .page.active[data-page="slot-game"] > section.panel .side {
+ min-height: 0;
+ height: 100%;
+ padding: 14px 20px 18px;
+ grid-template-rows: auto 1fr auto;
+ overflow: hidden;
+ }
+
+ .page.active[data-page="slot-game"] > section.panel .history {
+ min-height: 0;
+ max-height: none;
  }
 
  .balance-card {
@@ -1118,6 +1281,59 @@
  top: 60%;
  left: 50%;
  }
+
+.rocket-container {
+ position: absolute;
+ top: 10%;
+ left: 25%;
+ z-index: 3;
+ animation: rocketFly 12s linear infinite;
+}
+
+@keyframes rocketFly {
+ 0% { transform: translate(0, 0) rotate(45deg); }
+ 25% { transform: translate(50px, -30px) rotate(40deg); }
+ 50% { transform: translate(100px, 0) rotate(45deg); }
+ 75% { transform: translate(50px, 30px) rotate(50deg); }
+ 100% { transform: translate(0, 0) rotate(45deg); }
+}
+
+.rocket {
+ font-size: 40px;
+ filter: drop-shadow(0 0 10px rgba(255, 200, 0, 0.5));
+ position: relative;
+}
+
+.rocket::after {
+ content: '';
+ position: absolute;
+ bottom: -10px;
+ left: 50%;
+ transform: translateX(-50%);
+ width: 8px;
+ height: 15px;
+ background: linear-gradient(to bottom, #ff6b00, #ff9500);
+ border-radius: 0 0 4px 4px;
+ animation: rocketFlame 0.3s ease-in-out infinite;
+}
+
+@keyframes rocketFlame {
+ 0%, 100% { height: 15px; opacity: 1; }
+ 50% { height: 20px; opacity: 0.8; }
+}
+
+.cat-in-rocket {
+ position: absolute;
+ font-size: 20px;
+ top: 5px;
+ left: 8px;
+ animation: catBounce 1s ease-in-out infinite;
+}
+
+@keyframes catBounce {
+ 0%, 100% { transform: translateY(0); }
+ 50% { transform: translateY(-3px); }
+}
 
  .settings-btn {
  position: fixed;
@@ -1358,7 +1574,12 @@
  background: linear-gradient(135deg, rgba(167, 139, 250, 0.15), rgba(96, 165, 250, 0.1));
  border: 2px solid rgba(167, 139, 250, 0.3);
  border-radius: 20px;
- padding: 24px;
+ width: 150px;
+ height: 240px;
+ padding: 0;
+ display: grid;
+ grid-template-rows: 150px 44.81px 22.44px;
+ align-content: start;
  text-align: center;
  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
  position: relative;
@@ -1385,46 +1606,98 @@
  }
 
  .game-icon {
+ width: 150px;
+ height: 150px;
+ position: relative;
+ display: flex;
+ align-items: center;
+ justify-content: center;
  font-size: 64px;
- margin-bottom: 16px;
+ margin: 0;
+ background: linear-gradient(180deg, rgba(167, 139, 250, 0.24), rgba(96, 165, 250, 0.12));
  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
  }
 
+.game-card:nth-child(1) .game-icon {
+ background: linear-gradient(180deg, rgba(167, 139, 250, 0.34), rgba(96, 165, 250, 0.18));
+}
+
+.game-card:nth-child(2) .game-icon {
+ background: linear-gradient(180deg, rgba(34, 197, 94, 0.28), rgba(167, 139, 250, 0.14));
+}
+
+.game-card:nth-child(3) .game-icon {
+ background: linear-gradient(180deg, rgba(96, 165, 250, 0.28), rgba(34, 197, 94, 0.14));
+}
+
+.game-card:nth-child(4) .game-icon {
+ background: linear-gradient(180deg, rgba(56, 189, 248, 0.34), rgba(59, 130, 246, 0.18));
+}
+
  .game-title {
- font-size: 22px;
+ position: absolute;
+ left: 0;
+ right: 0;
+ top: 116px;
+ z-index: 2;
+ padding: 8px 8px 10px;
+ background: linear-gradient(180deg, rgba(6, 10, 18, 0), rgba(6, 10, 18, 0.82) 45%, rgba(6, 10, 18, 0.96));
+ font-size: 16px;
  font-weight: 700;
- margin: 0 0 12px 0;
+ margin: 0;
  color: var(--text);
+ line-height: 1;
  }
 
  .game-desc {
- font-size: 14px;
- color: var(--muted);
- margin: 0 0 16px 0;
- line-height: 1.5;
+ width: 150px;
+ height: 44.81px;
+ text-align: center;
+ display: grid;
+ place-items: center;
+ overflow: hidden;
+ padding: 6px 10px 0;
+ font-size: 15px;
+ font-weight: 700;
+ color: var(--text);
+ margin: 0;
+ line-height: 1.2;
+ text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
  }
 
  .game-stats {
- display: flex;
- gap: 8px;
- justify-content: center;
- flex-wrap: wrap;
+ width: 150px;
+ height: 22.44px;
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 4px;
+ align-items: center;
+ padding: 0 8px 8px;
  }
 
  .game-tag {
+ min-width: 0;
+ height: 22.44px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
  background: rgba(34, 197, 94, 0.2);
  border: 1px solid rgba(34, 197, 94, 0.4);
  color: rgba(34, 197, 94, 0.9);
- padding: 4px 12px;
+ padding: 0 6px;
  border-radius: 999px;
- font-size: 12px;
+ font-size: 10px;
  font-weight: 600;
+ white-space: nowrap;
+ overflow: hidden;
+ text-overflow: ellipsis;
  }
 
  .games-grid {
  display: grid;
- grid-template-columns: repeat(6, 1fr);
- gap: 20px;
+grid-template-columns: repeat(auto-fit, 150px);
+justify-content: center;
+gap: 16px;
  padding: 20px;
  }
 
@@ -3007,8 +3280,7 @@ flex: 1;
 <button type="button" id="regPassToggle" class="password-toggle" onclick="togglePassword('regPass', 'regPassToggle')" aria-label="Показать пароль" title="Показать пароль">&#128065;</button>
  </div>
  <button type="button" class="auth-btn" onclick="registerUser()">Создать аккаунт</button>
- <button type="button" class="auth-btn secondary" onclick="skipAuth()">Пропустить</button>
- </div>
+</div>
  </div>
 
  <div id="authMsg" class="auth-msg"></div>
@@ -3055,6 +3327,10 @@ flex: 1;
  <div class="moon-container">
  <div class="moon"></div>
  </div>
+<div class="rocket-container" aria-hidden="true">
+ <div class="rocket">🚀</div>
+ <div class="cat-in-rocket">🐱</div>
+</div>
  <div class="main-menu-content">
  <h1 class="menu-title">Artikotus</h1>
  <p class="menu-subtitle">Добро пожаловать в мир кошачьих развлечений!</p>
@@ -3083,7 +3359,7 @@ flex: 1;
  <header>
  <div class="title">
  <h1>Артикотус</h1>
- <p>Котослоты на виртуальные кредиты</p>
+ <p>1 сезон</p>
  </div>
  <div class="stats">
  <div class="pill">Котейки: <strong id="balance">0</strong></div>
@@ -3095,55 +3371,56 @@ flex: 1;
  </div>
  </header>
 
- <nav class="tabs" aria-label="Навигация">
- <button class="tab active" data-tab="slots">Слоты</button>
+<div class="content-shell">
+ <nav class="tabs" id="sideTabs" aria-label="Навигация">
+ <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-expanded="true" aria-controls="sideTabs">◀</button>
+ <button class="tab active" data-tab="slots">Дом</button>
  <button class="tab" data-tab="shop">Магазин</button>
  <button class="tab" data-tab="achievements">Достижения</button>
+ <button class="tab" data-tab="friends">Друзья</button>
+ <button class="tab" data-tab="profile">Профиль</button>
 <button class="tab" data-tab="codes">Коды</button>
  </nav>
 
  <main>
  <div class="page active" data-page="slots">
  <section class="panel" aria-label="Плейсы">
- <h2 style="margin: 0 0 20px; font-size: 24px; text-align: center; color: var(--accent);">Рекомендовано для тебя</h2>
  <div class="games-grid">
  <div class="game-card" onclick="openSlotGame()" style="cursor: pointer;">
 <div class="game-icon"></div>
- <h3 class="game-title">Артикотус</h3>
+ <p class="game-desc">Кото-Слоты</p>
  <div class="game-stats">
- <span class="game-tag">Популярное</span>
- <span class="game-tag">3 барабана</span>
+ <span class="game-tag">без оценки</span>
+ <span class="game-tag">локально</span>
  </div>
  </div>
- <div class="game-card" style="opacity: 0.7; cursor: default;">
+ <div class="game-card" onclick="openMeowNopoly()" style="cursor: pointer;">
 <div class="game-icon"></div>
- <h3 class="game-title">Мяу-нополия</h3>
- <p class="game-desc">Плейс с иконкой оставлен. Игра будет пересобрана.</p>
+ <p class="game-desc">Мяу-Нополия</p>
  <div class="game-stats">
-<span class="game-tag">Скоро</span>
- <span class="game-tag">Пересборка</span>
+<span class="game-tag">без оценки</span>
+ <span class="game-tag">локально</span>
  </div>
  </div>
  <div class="game-card" onclick="openKotoBot()" style="cursor: pointer;">
 <div class="game-icon"></div>
- <h3 class="game-title">Котобот</h3>
- <p class="game-desc">Локальный чат с персонажем прямо внутри Artikotus.</p>
+ <p class="game-desc">Человек или нет</p>
  <div class="game-stats">
- <span class="game-tag">AI</span>
-<span class="game-tag">Локально</span>
+ <span class="game-tag">без оценки</span>
+<span class="game-tag">локально</span>
+ </div>
+ </div>
+ <div class="game-card" onclick="openDroneGame()" style="cursor: pointer;">
+<div class="game-icon"></div>
+ <p class="game-desc">Дрон</p>
+ <div class="game-stats">
+ <span class="game-tag">без оценки</span>
+<span class="game-tag">локально</span>
  </div>
  </div>
  </div>
  </section>
 
- <aside class="panel" aria-label="Правила">
- <div class="side">
- <h2>Информация</h2>
- <p style="color: var(--muted); font-size: 14px; line-height: 1.6;">
- Выберите игру из доступных плейсов и начните играть!
- </p>
- </div>
- </aside>
  </div>
 
  <div class="page" id="slotGamePage" data-page="slot-game" style="display: none;">
@@ -3183,7 +3460,6 @@ flex: 1;
  <div class="side" style="border-top: 1px solid var(--stroke);">
  <h2>История</h2>
  <div id="history" class="history" aria-label="История спинов"></div>
- <button id="share" class="primary" style="width: 100%;">Поделиться</button>
  </div>
  <div id="achievement" class="achievement" style="display: none;">
  <div class="achievement-content">
@@ -3194,16 +3470,6 @@ flex: 1;
  </div>
  </section>
 
- <aside class="panel" aria-label="Правила и история">
- <div class="side">
- <h2>Выплаты</h2>
- <div class="table" id="payouts"></div>
-
- <div class="fine">
- Управление: <span class="kbd">Space</span> — крутить, <span class="kbd">R</span> — сброс.
- </div>
- </div>
- </aside>
  </div>
 
  <div class="page" data-page="shop">
@@ -3232,6 +3498,35 @@ flex: 1;
  <section class="panel" aria-label="Достижения">
  <h2>Достижения</h2>
  <div id="achievementsList" class="achievements-list"></div>
+ </section>
+ </div>
+
+ <div class="page" data-page="friends">
+ <section class="panel" aria-label="Друзья">
+ <div class="drawer-page">
+ <h2>Друзья</h2>
+ <div class="drawer-card-grid">
+ <div class="drawer-info-card">
+ <p class="drawer-info-label">Статус</p>
+ <p class="drawer-info-value">Скоро</p>
+ <p class="drawer-info-note">Здесь появятся друзья, приглашения и быстрый вход в комнаты.</p>
+ </div>
+ <div class="drawer-info-card">
+ <p class="drawer-info-label">Сейчас доступно</p>
+ <p class="drawer-info-value">Локальная игра</p>
+ <p class="drawer-info-note">Пока можно играть, копить котейки и пользоваться остальными разделами приложения.</p>
+ </div>
+ </div>
+ </div>
+ </section>
+ </div>
+
+ <div class="page" data-page="profile">
+ <section class="panel" aria-label="Профиль">
+ <div class="drawer-page">
+ <h2>Профиль</h2>
+ <div id="profileSummary" class="drawer-card-grid"></div>
+ </div>
  </section>
  </div>
 
@@ -3290,7 +3585,7 @@ flex: 1;
  </section>
  </div>
 
- </main>
+</div>
  </div>
 
  <!-- Chest Overlay -->
@@ -3400,7 +3695,7 @@ const PRIZE_TIERS_IN_WIN = [
  codeInput: document.getElementById("codeInput"),
  codeBtn: document.getElementById("codeBtn"),
  codeMsg: document.getElementById("codeMsg"),
- share: document.getElementById("share"),
+ profileSummary: document.getElementById("profileSummary"),
  achievementsList: document.getElementById("achievementsList"),
  shopTimer: document.getElementById("shopTimer"),
  currentItems: document.getElementById("currentItems"),
@@ -3991,6 +4286,46 @@ if (!sym) return { won: 0, reason: "Мимо" };
  });
  }
 
+function formatProfileDate(value) {
+ if (!value) return "Не указана";
+ const date = new Date(value);
+ if (Number.isNaN(date.getTime())) return "Не указана";
+ return date.toLocaleDateString("ru-RU");
+}
+
+function renderProfileSummary() {
+ if (!els.profileSummary) return;
+
+ const displayName = currentUser?.login || currentUser?.nickname || currentUser?.username || "Гость";
+ const userId = currentUser?.id || "Локальный";
+ const coins = typeof currentUser?.coins === "number" ? format(currentUser.coins) : format(state.balance);
+ const crystals = typeof currentUser?.crystals === "number" ? format(currentUser.crystals) : "0";
+ const createdAt = formatProfileDate(currentUser?.created_at);
+
+ els.profileSummary.innerHTML = `
+  <div class="drawer-info-card">
+   <p class="drawer-info-label">Имя</p>
+   <p class="drawer-info-value">${displayName}</p>
+   <p class="drawer-info-note">ID: ${userId}</p>
+  </div>
+  <div class="drawer-info-card">
+   <p class="drawer-info-label">Котейки</p>
+   <p class="drawer-info-value">${coins}</p>
+   <p class="drawer-info-note">Текущий игровой баланс</p>
+  </div>
+  <div class="drawer-info-card">
+   <p class="drawer-info-label">Кристаллы</p>
+   <p class="drawer-info-value">${crystals}</p>
+   <p class="drawer-info-note">Премиум-валюта аккаунта</p>
+  </div>
+  <div class="drawer-info-card">
+   <p class="drawer-info-label">Профиль создан</p>
+   <p class="drawer-info-value">${createdAt}</p>
+   <p class="drawer-info-note">Дата регистрации текущего пользователя</p>
+  </div>
+ `;
+}
+
  function renderAchievements() {
  if (!els.achievementsList) return;
  const items = [
@@ -4072,7 +4407,7 @@ unlocked: state.achievementShown
  return `<div class="row"><span>${a} / ${b}</span><strong>x${s.payout3} / x${s.payout2}</strong></div>`;
  })
  .join("");
- els.payouts.innerHTML = tiersHtml + payoutsHtml;
+ if (els.payouts) els.payouts.innerHTML = tiersHtml + payoutsHtml;
 
  els.history.innerHTML = state.history
  .slice(0, 20)
@@ -4084,6 +4419,7 @@ unlocked: state.achievementShown
  })
  .join("");
  renderAchievements();
+ renderProfileSummary();
  const shopPage = document.querySelector('.page[data-page="shop"]');
  if (shopPage && shopPage.classList.contains("active")) {
  renderShop();
@@ -4388,32 +4724,11 @@ setBadge("Мимо", "bad");
  }
  }
 
- async function shareApp() {
- const shareData = {
- title: "Артикотус",
- text: "Заходи крутить котослоты! Код 'start' даст тебе 5000 котеек! Artikotus",
- url: window.location.href
- };
-
- try {
- if (navigator.share && window.location.protocol !== 'file:') {
- await navigator.share(shareData);
- els.msg.textContent = "Поделиться успешно!";
- } else {
- await navigator.clipboard.writeText(shareData.text);
- els.msg.textContent = "Ссылка скопирована в буфер обмена!";
- }
- } catch (err) {
- if (err.name !== 'AbortError') {
- els.msg.textContent = "Не удалось поделиться";
- }
- }
- }
-
  /* Auth Logic */
 
-const API_BASE_URL = '/bd/auth.php';
+const API_BASE_URL = new URL('./bd/auth.php', window.location.href).toString();
 const IS_LOCAL_STATIC_DEV = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const IS_LOCALHOST_8000 = ['localhost', '127.0.0.1'].includes(window.location.hostname) && String(window.location.port || '') === '8000';
 const MAX_NICKNAME_LENGTH = 14;
 
  function setPlayMode(active) {
@@ -4429,6 +4744,7 @@ const MAX_NICKNAME_LENGTH = 14;
  // Используем session-based аутентификацию через POST /login
  const response = await fetch(`${API_BASE_URL}/login`, {
  method: 'POST',
+ credentials: 'same-origin',
  headers: {
  'Content-Type': 'application/json',
  'Accept': 'application/json'
@@ -4441,14 +4757,14 @@ const MAX_NICKNAME_LENGTH = 14;
 
  const data = await response.json();
 
- if (!response.ok) {
- throw new Error(data.message || 'Неверный логин или пароль');
+ if (!response.ok || !data.success || !data.user) {
+ throw new Error(data.message || data.error || 'Неверный логин или пароль');
  }
 
  // Сохраняем информацию о пользователе
- localStorage.setItem('current_user', JSON.stringify(data));
+ localStorage.setItem('current_user', JSON.stringify(data.user));
  
- return { user: data };
+ return { user: data.user };
  } catch (error) {
  localStorage.removeItem('current_user');
  throw error;
@@ -4459,6 +4775,7 @@ const MAX_NICKNAME_LENGTH = 14;
  // Используем session-based регистрацию через POST /register
  const response = await fetch(`${API_BASE_URL}/register`, {
  method: 'POST',
+ credentials: 'same-origin',
  headers: {
  'Content-Type': 'application/json',
  'Accept': 'application/json'
@@ -4471,8 +4788,8 @@ const MAX_NICKNAME_LENGTH = 14;
 
  const data = await response.json();
 
- if (!response.ok) {
- throw new Error(data.message || 'Ошибка регистрации');
+ if (!response.ok || !data.success || !data.user) {
+ throw new Error(data.message || data.error || 'Ошибка регистрации');
  }
 
  // После регистрации автоматически логинимся
@@ -4536,6 +4853,28 @@ button.setAttribute('title', type === 'password' ? 'Показать парол�
 function clearStoredAuth() {
  localStorage.removeItem('koto_last_user');
  localStorage.removeItem('current_user');
+}
+
+function canSkipAuthOnSpace() {
+ const authScreen = document.getElementById('authScreen');
+ return IS_LOCALHOST_8000 && authScreen && !authScreen.classList.contains('hidden') && authScreen.style.display !== 'none';
+}
+
+function skipAuthForLocalhost() {
+ if (!canSkipAuthOnSpace()) return false;
+ const demoUser = {
+ id: 'localhost-8000-demo',
+ login: 'local_demo',
+ nickname: 'local_demo',
+ crystals: 150,
+ coins: 500,
+ created_at: new Date().toISOString()
+ };
+ localStorage.setItem('current_user', JSON.stringify(demoUser));
+ localStorage.setItem('koto_last_user', demoUser.id);
+ setAuthMsg('Локальный вход без авторизации включён.', 'info');
+ onLoginSuccess(demoUser);
+ return true;
 }
 
  async function registerUser() {
@@ -4625,25 +4964,7 @@ function clearStoredAuth() {
  document.getElementById('welcomeMessage').style.display = 'none';
  }
 
- function skipAuth() {
- currentUser = null;
- STORAGE_KEY = "kotoslots_save_guest";
- SHOP_STORAGE_KEY = "kotoslots_shop_guest";
- clearStoredAuth();
  
- showLoading(() => {
- hideAuthScreen();
- document.getElementById('mainMenu').classList.remove('hidden');
- document.getElementById('gameApp').classList.add('hidden');
- setPlayMode(false);
- 
- resetAll(true);
- load();
- render();
- 
- els.msg.innerHTML = 'Добро пожаловать!';
- });
- }
 
  function showLoading(callback) {
  const loadingScreen = document.getElementById('loadingScreen');
@@ -5594,6 +5915,15 @@ cat.textContent = 'К';
  document.querySelectorAll(".tab").forEach((tab) => {
  tab.addEventListener("click", () => setTab(tab.dataset.tab));
  });
+const sidebarToggle = document.getElementById("sidebarToggle");
+const gameApp = document.getElementById("gameApp");
+if (sidebarToggle && gameApp) {
+ sidebarToggle.addEventListener("click", () => {
+ const collapsed = gameApp.classList.toggle("sidebar-collapsed");
+ sidebarToggle.textContent = collapsed ? "▶" : "◀";
+ sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
+ });
+}
  setTab("slots");
  
  checkShopUpdate();
@@ -5625,8 +5955,12 @@ cat.textContent = 'К';
  els.codeInput.addEventListener("keypress", (e) => {
  if (e.key === "Enter") redeemCode();
  });
- els.share.addEventListener("click", shareApp);
  window.addEventListener("keydown", (e) => {
+ if (e.code === "Space" && canSkipAuthOnSpace()) {
+ e.preventDefault();
+ skipAuthForLocalhost();
+ return;
+ }
  if (e.target.matches("input, textarea")) return;
  
  if (e.code === "Space") {
@@ -5636,7 +5970,7 @@ cat.textContent = 'К';
  if (e.key.toLowerCase() === "r") {
  resetAll();
  }
- });
+});
  setBadge("Готов");
  }
 
@@ -5710,6 +6044,14 @@ cat.textContent = 'К';
  if (slotGamePage) slotGamePage.style.display = '';
  }
 
+function openMeowNopoly() {
+window.location.href = 'meow-nopoly/';
+}
+
+function openDroneGame() {
+window.location.href = 'game/';
+}
+
  function createMenuDecorations() {
  const decorations = document.getElementById('menuDecorations');
  if (!decorations) return;
@@ -5762,8 +6104,13 @@ let kotoChatMatchDeadline = 0;
 let kotoChatWaitingForMatch = false;
 let kotoChatActualRole = 'bot';
 let kotoChatRoomReady = false;
+let kotoChatReconnectTimerId = null;
 const KOTO_CHAT_SESSION_MS = 2 * 60 * 1000;
 const KOTO_CHAT_IDLE_MS = 20 * 1000;
+const KOTO_CHAT_MATCH_WAIT_SECONDS = 0;
+const KOTO_CHAT_ROOM_STORAGE_KEY = 'kotochat_room_id';
+const KOTO_CHAT_RECONNECT_TOKEN_KEY = 'kotochat_reconnect_token';
+const KOTO_CHAT_HISTORY_STORAGE_KEY = 'kotochat_room_history';
 
 function kotoChatScrollToBottom() {
  var msgs = document.getElementById('kotoChatMessages');
@@ -5806,6 +6153,41 @@ function kotoChatGetSocketUrl() {
  return protocol + host + ':8765';
 }
 
+function kotoChatGetReconnectToken() {
+ var token = localStorage.getItem(KOTO_CHAT_RECONNECT_TOKEN_KEY);
+ if (!token) {
+ token = 'koto_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+ localStorage.setItem(KOTO_CHAT_RECONNECT_TOKEN_KEY, token);
+ }
+ return token;
+}
+function kotoChatGetStoredRoomId() { return localStorage.getItem(KOTO_CHAT_ROOM_STORAGE_KEY) || ''; }
+function kotoChatGetHistoryKey(roomId) { return KOTO_CHAT_HISTORY_STORAGE_KEY + ':' + (roomId || kotoChatGetStoredRoomId()); }
+function kotoChatStoreRoomId(roomId) { if (roomId) localStorage.setItem(KOTO_CHAT_ROOM_STORAGE_KEY, roomId); }
+function kotoChatSaveHistory() {
+ var roomId = kotoChatGetStoredRoomId();
+ if (!roomId) return;
+ localStorage.setItem(kotoChatGetHistoryKey(roomId), JSON.stringify(kotoChatMessagesHistory.slice(-50)));
+}
+function kotoChatLoadHistory(roomId) {
+ try {
+  var raw = localStorage.getItem(kotoChatGetHistoryKey(roomId));
+  var parsed = raw ? JSON.parse(raw) : [];
+  return Array.isArray(parsed) ? parsed.filter(function(item) { return item && (item.role === 'user' || item.role === 'assistant') && typeof item.content === 'string' && item.content.trim(); }) : [];
+ } catch (err) {
+  return [];
+ }
+}
+function kotoChatClearStoredRoomId() { localStorage.removeItem(KOTO_CHAT_ROOM_STORAGE_KEY); }
+function kotoChatClearHistory(roomId) { localStorage.removeItem(kotoChatGetHistoryKey(roomId)); }
+function kotoChatStopReconnect() { if (kotoChatReconnectTimerId) { clearTimeout(kotoChatReconnectTimerId); kotoChatReconnectTimerId = null; } }
+function kotoChatScheduleReconnect() {
+ if (kotoChatReconnectTimerId || kotoChatEnded || !kotoChatGetStoredRoomId()) return;
+ kotoChatSetEmptyState('Переподключение', 'Пробуем восстановить комнату...');
+ kotoChatSetHint('Переподключаемся...');
+ kotoChatReconnectTimerId = setTimeout(function() { kotoChatReconnectTimerId = null; kotoChatConnect(true); }, 1000);
+}
+
 function kotoChatFormatTime(totalSeconds) {
  var safe = Math.max(0, totalSeconds);
  var minutes = Math.floor(safe / 60);
@@ -5816,6 +6198,12 @@ function kotoChatFormatTime(totalSeconds) {
 function kotoChatUpdateTimerDisplay() {
  var timer = document.getElementById('kotoChatTimer');
  if (!timer) return;
+ if (kotoChatWaitingForMatch && !kotoChatRoomReady) {
+ var matchSecondsLeft = Math.ceil(Math.max(0, kotoChatMatchDeadline - Date.now()) / 1000);
+ timer.textContent = kotoChatFormatTime(matchSecondsLeft);
+ timer.classList.remove('warning');
+ return;
+ }
  var secondsLeft = Math.ceil(Math.max(0, kotoChatSessionDeadline - Date.now()) / 1000);
  timer.textContent = kotoChatFormatTime(secondsLeft);
  timer.classList.toggle('warning', secondsLeft <= 30 && secondsLeft > 0);
@@ -5883,8 +6271,9 @@ function kotoChatUpdateSearchState() {
 function kotoChatStartMatchCountdown(waitSeconds) {
  kotoChatWaitingForMatch = true;
  kotoChatStopMatchCountdown();
- kotoChatMatchDeadline = Date.now() + (Math.max(1, waitSeconds || 7) * 1000);
+ kotoChatMatchDeadline = Date.now() + (Math.max(0, waitSeconds || KOTO_CHAT_MATCH_WAIT_SECONDS) * 1000);
  kotoChatUpdateSearchState();
+ kotoChatUpdateTimerDisplay();
  kotoChatMatchTimerId = setInterval(kotoChatUpdateSearchState, 250);
 }
 
@@ -5916,13 +6305,17 @@ function kotoChatCloseSocket(notifyServer) {
 
 function kotoChatEndSession(text) {
  if (kotoChatEnded) return;
+ var endedRoomId = kotoChatGetStoredRoomId();
  kotoChatEnded = true;
  kotoChatShowTyping(false);
  kotoChatBusy = false;
  kotoChatRoomReady = false;
  kotoChatStopTimers();
  kotoChatStopMatchCountdown();
+ kotoChatStopReconnect();
  kotoChatWaitingForMatch = false;
+ if (endedRoomId) kotoChatClearHistory(endedRoomId);
+ kotoChatClearStoredRoomId();
  var input = document.getElementById('kotoChatInput');
  var sendBtn = document.getElementById('kotoChatSendBtn');
  if (input) input.disabled = true;
@@ -6035,7 +6428,22 @@ function kotoChatSetBusy(isBusy) {
  kotoChatRefreshHint();
 }
 
-function kotoBotAddMessage(role, text) {
+function kotoChatNormalizeHistory(history) {
+ return Array.isArray(history) ? history.filter(function(item) {
+  return item && (item.role === 'user' || item.role === 'assistant') && typeof item.content === 'string' && item.content.trim();
+ }).slice(-50) : [];
+}
+
+function kotoChatRenderHistory(history) {
+ var msgs = document.getElementById('kotoChatMessages');
+ if (!msgs) return;
+ msgs.innerHTML = '<div class="kotochat-empty" id="kotoChatEmptyState"><div class="kotochat-empty-icon">:3</div><div class="kotochat-empty-title">Напиши сообщение</div><div class="kotochat-empty-text" id="kotoChatEmptyText"></div></div>';
+ kotoChatMessagesHistory = kotoChatNormalizeHistory(history);
+ kotoChatMessagesHistory.forEach(function(item) { kotoBotAddMessage(item.role, item.content, true); });
+ kotoChatSaveHistory();
+}
+
+function kotoBotAddMessage(role, text, skipHistorySave) {
  var msgs = document.getElementById('kotoChatMessages');
  if (!msgs) return;
  if (role === 'system') return;
@@ -6062,6 +6470,9 @@ function kotoBotAddMessage(role, text) {
  kotoChatSyncEmptyState();
  if (role === 'assistant') {
  kotoChatArmIdleTimer();
+ }
+ if (!skipHistorySave) {
+  kotoChatSaveHistory();
  }
  kotoChatUpdateGuessMenu();
  kotoChatScrollToBottom();
@@ -6113,7 +6524,7 @@ function kotoChatHandleSocketMessage(event) {
  if (data.type === 'waiting_for_players') {
  kotoChatRoomReady = false;
  kotoChatSetBusy(false);
- kotoChatStartMatchCountdown(data.wait_seconds || 7);
+ kotoChatStartMatchCountdown(data.wait_seconds || KOTO_CHAT_MATCH_WAIT_SECONDS);
  return;
  }
 
@@ -6124,11 +6535,14 @@ function kotoChatHandleSocketMessage(event) {
  }
 
  if (data.type === 'chat_matched') {
+ kotoChatStopReconnect();
+ if (data.room_id) kotoChatStoreRoomId(data.room_id);
+ kotoChatRenderHistory(Array.isArray(data.history) ? data.history : kotoChatLoadHistory(data.room_id || kotoChatGetStoredRoomId()));
  kotoChatActualRole = data.is_bot ? 'bot' : 'player';
  kotoChatRoomReady = true;
  kotoChatWaitingForMatch = false;
  kotoChatStopMatchCountdown();
- kotoChatSetEmptyState('Напиши сообщение', '');
+ kotoChatSetEmptyState(data.resumed ? 'Комната восстановлена' : 'Напиши сообщение', Array.isArray(data.history) && data.history.length ? 'История комнаты восстановлена с сервера.' : '');
  kotoChatSetBusy(false);
  kotoChatStartTimers();
  var input = document.getElementById('kotoChatInput');
@@ -6140,11 +6554,22 @@ function kotoChatHandleSocketMessage(event) {
  var replyText = typeof data.message === 'string' && data.message.trim() ? data.message.trim() : '...';
  kotoChatMessagesHistory.push({ role: 'assistant', content: replyText });
  kotoBotAddMessage('assistant', replyText);
+ kotoChatSaveHistory();
  kotoChatSetBusy(false);
  return;
  }
 
  if (data.type === 'chat_message_sent') {
+ return;
+ }
+
+ if (data.type === 'chat_partner_reconnecting') {
+ kotoChatSetHint('Собеседник переподключается...');
+ return;
+ }
+
+ if (data.type === 'chat_partner_resumed') {
+ kotoChatSetHint('Собеседник вернулся');
  return;
  }
 
@@ -6163,9 +6588,10 @@ function kotoChatHandleSocketMessage(event) {
  }
 }
 
-function kotoChatConnect() {
+function kotoChatConnect(isResumeAttempt) {
  kotoChatCloseSocket(false);
- kotoChatWaitingForMatch = true;
+ kotoChatStopReconnect();
+ kotoChatWaitingForMatch = false;
  try {
  var socket = new WebSocket(kotoChatGetSocketUrl());
  kotoChatSocket = socket;
@@ -6173,8 +6599,11 @@ function kotoChatConnect() {
  socket.addEventListener('open', function() {
  socket.send(JSON.stringify({
  type: 'chat_join',
- nickname: kotoChatGetNickname()
+ nickname: kotoChatGetNickname(),
+ room_id: kotoChatGetStoredRoomId(),
+ reconnect_token: kotoChatGetReconnectToken()
  }));
+ if (isResumeAttempt) kotoChatSetHint('Комната переподключается...');
  });
 
  socket.addEventListener('message', kotoChatHandleSocketMessage);
@@ -6182,6 +6611,12 @@ function kotoChatConnect() {
  socket.addEventListener('close', function() {
  if (kotoChatSocket !== socket) return;
  kotoChatSocket = null;
+ if (!kotoChatEnded && kotoChatGetStoredRoomId()) {
+ kotoChatRoomReady = false;
+ kotoChatSetBusy(true);
+ kotoChatScheduleReconnect();
+ return;
+ }
  if (!kotoChatEnded) {
  kotoChatEndSession(kotoChatRoomReady ? 'Соединение потеряно' : 'Не удалось подключиться');
  }
@@ -6189,11 +6624,19 @@ function kotoChatConnect() {
 
  socket.addEventListener('error', function() {
  if (kotoChatSocket !== socket) return;
+ if (!kotoChatEnded && kotoChatGetStoredRoomId()) {
+ kotoChatScheduleReconnect();
+ return;
+ }
  if (!kotoChatEnded) {
  kotoChatEndSession(kotoChatRoomReady ? 'Соединение потеряно' : 'Ошибка соединения');
  }
  });
  } catch (err) {
+ if (kotoChatGetStoredRoomId()) {
+ kotoChatScheduleReconnect();
+ return;
+ }
  kotoChatEndSession('Ошибка соединения');
  }
 }
@@ -6202,19 +6645,19 @@ function kotoBotRestart() {
  var input = document.getElementById('kotoChatInput');
  var msgs = document.getElementById('kotoChatMessages');
  kotoChatCloseSocket(true);
+ kotoChatStopReconnect();
  kotoChatEnded = false;
  kotoChatRoomReady = false;
  kotoChatActualRole = 'bot';
  kotoChatShowTyping(false);
  kotoChatStopTimers();
  if (msgs) {
- msgs.innerHTML = '<div class="kotochat-empty" id="kotoChatEmptyState"><div class="kotochat-empty-icon">:3</div><div class="kotochat-empty-title">Ищем собеседника</div><div class="kotochat-empty-text" id="kotoChatEmptyText">Ждем, появится ли собеседник в течение 7с</div></div>';
- }
- kotoChatMessagesHistory = [];
- kotoChatSelectedGuess = '';
- kotoChatWaitingForMatch = true;
- kotoChatStartMatchCountdown(7);
- kotoChatSetBusy(false);
+ msgs.innerHTML = '<div class="kotochat-empty" id="kotoChatEmptyState"><div class="kotochat-empty-icon">:3</div><div class="kotochat-empty-title">Подключаем собеседника</div><div class="kotochat-empty-text" id="kotoChatEmptyText">Подготавливаем чат...</div></div>';
+}
+kotoChatMessagesHistory = [];
+kotoChatSelectedGuess = '';
+kotoChatWaitingForMatch = false;
+kotoChatSetBusy(false);
  if (input) {
  input.value = '';
  input.disabled = true;
@@ -6223,7 +6666,7 @@ function kotoBotRestart() {
  kotoChatSyncEmptyState();
  kotoChatUpdateGuessMenu();
  kotoChatRefreshHint();
- kotoChatConnect();
+ kotoChatConnect(Boolean(kotoChatGetStoredRoomId()));
 }
 
 function kotoChatSend() {

@@ -5,6 +5,8 @@ import socket
 import subprocess
 import sys
 
+from server_access import get_server_access_defaults
+
 
 def try_paramiko(host: str, user: str, password: str, remote_cmd: str) -> int:
     try:
@@ -117,12 +119,17 @@ def try_wexpect(host: str, user: str, password: str, remote_cmd: str) -> int:
 
 
 def main() -> int:
+    defaults = get_server_access_defaults()
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("--host", default="192.168.0.39")
-    parser.add_argument("--user", default="kassir")
-    parser.add_argument("--password", default="75435789")
+    parser.add_argument("--host", default=defaults["host"])
+    parser.add_argument("--user", default=defaults["user"])
+    parser.add_argument("--password", default=defaults["password"])
     parser.add_argument("--cmd", default="whoami; hostname")
     args = parser.parse_args()
+
+    if not args.host or not args.user or not args.password:
+        parser.error("Missing hosting access. Use server_access.local.env or pass --host/--user/--password.")
 
     # Fast reachability hint before auth attempts.
     try:

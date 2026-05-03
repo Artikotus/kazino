@@ -5,6 +5,14 @@ openrouter.key
 zai.key
 !.env.example
 
+# Local server access / deploy secrets
+README_DEPLOY_SERVER.md
+server_access.local.*
+deploy_hosting.local.cmd
+deploy_hosting.local.ps1
+*.credentials.local.*
+*.secrets.local.*
+
 __pycache__/
 *.py[cod]
 
