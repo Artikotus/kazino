@@ -62,6 +62,7 @@ call :upload_file "%ROOT%index.html" "%REMOTE_WEB_ROOT%/index.html" || exit /b 1
 call :upload_file "%ROOT%manifest.json" "%REMOTE_WEB_ROOT%/manifest.json" || exit /b 1
 call :upload_dir  "%ROOT%bd" "%REMOTE_WEB_ROOT%/bd" || exit /b 1
 call :upload_dir  "%ROOT%game" "%REMOTE_WEB_ROOT%/game" || exit /b 1
+call :upload_dir  "%ROOT%meow-nopoly" "%REMOTE_WEB_ROOT%/meow-nopoly" || exit /b 1
 
 call :upload_file "%ROOT%websocket_server.py" "%REMOTE_RUNTIME_ROOT%/websocket_server.py" || exit /b 1
 call :upload_file "%ROOT%requirements.txt" "%REMOTE_RUNTIME_ROOT%/requirements.txt" || exit /b 1
